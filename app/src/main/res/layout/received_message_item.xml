@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:padding="4dp">
+
+
+    <RelativeLayout
+        android:id="@+id/received_RL"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/background_received_message"
+        android:layout_marginStart="4dp"
+        >
+        <TextView
+            android:id="@+id/received_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:paddingTop="12dp"
+            android:textSize="13sp"
+            android:textStyle="italic|bold"
+            android:textColor="@color/msgReceived"
+            android:maxLines="1"/>
+        <TextView
+            android:id="@+id/received_message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:paddingBottom="12dp"
+            android:textColor="@color/white"
+            android:maxWidth="300dp"
+            android:textSize="15sp"
+            android:layout_below="@id/received_name"
+            />
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/received_date_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/received_RL"
+        android:layout_alignStart="@id/received_RL"
+        android:layout_marginStart="4dp"
+        android:textSize="10sp"/>
+
+</RelativeLayout>
