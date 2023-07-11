@@ -21,7 +21,7 @@ import java.util.HashMap;
 public class MealCrud extends ViewModel {
 
     private final MutableLiveData<HashMap<String, Meal>> mMeals;
-
+// USED?
     public MealCrud() {
         mMeals = new MutableLiveData<>();
         HashMap<String, Meal> meals = new HashMap<>();
