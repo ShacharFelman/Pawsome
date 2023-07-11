@@ -1,5 +1,25 @@
 <resources>
     <string name="app_name">Pawsome</string>
+
+    <string name="title_user_profile">User Profile</string>
+    <string name="title_pet_profile">Pet Profile</string>
+
+    <string name="name_hint">Enter a Name</string>
+    <string name="phone_hint">Enter a Phone Number</string>
+    <string name="date_hint">dd/mm/yyyy</string>
+    <string name="food_type_hint">Food Type</string>
+    <string name="food_unit_hint">Units</string>
+    <string name="food_amount_hint">Amount</string>
+
+
+    <string name="upload_button">Upload Image</string>
+    <string name="save_button">Save</string>
+    <string name="add_pet_button">Add New Pet</string>
+    <string name="home_button">Go to HomePage</string>
+
+
+
+
     <string name="title_home">Home</string>
     <string name="title_my_groups">Your Groups</string>
     <string name="title_create_a_group">Create A Group</string>
@@ -13,7 +33,6 @@
     <string name="invalid_username">Not a valid username</string>
     <string name="invalid_password">Password must be >5 characters</string>
     <string name="login_failed">"Login failed"</string>
-    <string name="name">Enter a Name</string>
     <string name="description">Description</string>
     <string name="create">Create</string>
     <string name="create_a_group">Create A Group</string>
@@ -33,6 +52,12 @@
     <string name="region">Region</string>
     <string name="europe">Europe</string>
 
+    <string-array name="Gender">
+        <item>Male</item>
+        <item>Female</item>
+        <item>Undefined</item>
+    </string-array>
+
     <string-array name="Region">
         <item>Any</item>
         <item>Europe</item>
@@ -42,6 +67,7 @@
         <item>Africa</item>
         <item>Oceania</item>
     </string-array>
+
     <string-array name="Skill">
         <item>Any</item>
         <item>Beginner</item>

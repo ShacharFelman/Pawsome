@@ -16,4 +16,11 @@
     <color name="msgSent">#47BC2F</color>
     <color name="msgReceived">#DA8F24</color>
     <color name="star">#F4D562</color>
+
+    <color name="colorPrimary">#EB762B</color>
+    <color name="colorPrimaryDark">#E26A29</color>
+    <color name="colorPrimaryLight">#FFB54F</color>
+    <color name="colorRecycleItemText">#000000</color>
+
+
 </resources>

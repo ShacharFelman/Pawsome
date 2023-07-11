@@ -18,7 +18,7 @@
         android:textStyle="bold"
         />
 
-    <!-- Edit text to allow user to type name
+    <!-- Edit text to allow userProfile to type name
         of item he/she wants to search-->
     <EditText
         android:layout_width="match_parent"

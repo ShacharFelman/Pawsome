@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Activities.ui.create_a_group.CreateAGroupFragment">
+    tools:context=".view.fragment.CreateAGroupFragment">
 
     <ScrollView
         android:layout_width="match_parent"
@@ -44,7 +44,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textSize="16sp"
-                    android:hint="@string/name"
+                    android:hint="@string/name_hint"
                     android:textColorHint="@color/grey"
                     android:maxLength="15"
                     android:gravity="center_vertical"
