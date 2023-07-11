@@ -9,7 +9,7 @@ import android.os.Bundle;
 
 import com.example.pawsome.R;
 import com.example.pawsome.dal.FirebaseDB;
-import com.example.pawsome.current.CurrentUser;
+import com.example.pawsome.current_state.CurrentUser;
 import com.example.pawsome.model.UserProfile;
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract;
@@ -60,7 +60,6 @@ public class LoginActivity extends AppCompatActivity {
         finish();
     }
 
-    // See: https://developer.android.com/training/basics/intents/result
     private final ActivityResultLauncher<Intent> signInLauncher = registerForActivityResult(
             new FirebaseAuthUIActivityResultContract(),
             result -> onSignInResult(result)

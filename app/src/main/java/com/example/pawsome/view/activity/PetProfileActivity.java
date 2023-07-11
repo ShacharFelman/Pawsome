@@ -1,7 +1,6 @@
 package com.example.pawsome.view.activity;
 
 import android.Manifest;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -10,29 +9,24 @@ import android.util.Log;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatSpinner;
 import androidx.core.app.ActivityCompat;
-
 import com.example.pawsome.R;
 import com.example.pawsome.dal.DBCrud;
 import com.example.pawsome.dal.FirebaseDB;
-import com.example.pawsome.current.CurrentPet;
-import com.example.pawsome.current.CurrentUser;
+import com.example.pawsome.current_state.CurrentPet;
+import com.example.pawsome.current_state.CurrentUser;
 import com.example.pawsome.model.PetProfile;
 import com.example.pawsome.utils.Constants;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.datepicker.MaterialDatePicker;
-import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -40,7 +34,6 @@ import java.util.Date;
 public class PetProfileActivity extends AppCompatActivity {
 
     private StorageReference storageReference;
-
     private MaterialButton pet_BTN_upload;
     private MaterialButton pet_BTN_save;
     private MaterialButton pet_BTN_date_of_birth;
@@ -51,12 +44,11 @@ public class PetProfileActivity extends AppCompatActivity {
     private TextInputLayout pet_EDT_date_of_birth;
     private AppCompatSpinner pet_SP_gender;
 
-
     private static final int IMAGE_UPLOAD_REQUEST_CODE = 1;
-    private ProgressDialog progressDialog;
     private Uri imageUri;
     String imageUrl;
     private String fileName;
+    private ActivityResultLauncher<Intent> imagePickerLauncher;
 
     private boolean isImageUploaded = true;
     private PetProfile petProfile;
@@ -70,6 +62,7 @@ public class PetProfileActivity extends AppCompatActivity {
 
         initViews();
         setButtonsListener();
+        initImagePickerLauncher();
         setImageUploaded();
         initPetProfile();
     }
@@ -100,6 +93,18 @@ public class PetProfileActivity extends AppCompatActivity {
         pet_BTN_date_of_birth.setOnClickListener(v -> setDate());
     }
 
+    private void initImagePickerLauncher() {
+        imagePickerLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == RESULT_OK && result.getData() != null && result.getData().getData() != null) {
+                        setImageNotUploaded();
+                        imageUri = result.getData().getData();
+                        pet_IMG_profile.setImageURI(imageUri);
+                    }
+                }
+        );
+    }
     private void setDate(){
         MaterialDatePicker datePicker =
                 MaterialDatePicker.Builder.datePicker()
@@ -136,56 +141,24 @@ public class PetProfileActivity extends AppCompatActivity {
             Toast.makeText(this, "Please upload the image", Toast.LENGTH_SHORT).show();
     }
 
-    private void createPetProfile(String imageUrl) {
-        if (isImageUploaded) {
-            String name = pet_EDT_name.getEditText().getText().toString();
-            String gender = pet_SP_gender.getSelectedItem().toString();
-            String dateOfBirth = pet_EDT_date_of_birth.getEditText().getText().toString();
-
-            PetProfile petProfile = new PetProfile(name, gender, CurrentUser.getInstance().getUid(), dateOfBirth);
-
-            CurrentUser.getInstance().getUserProfile().getPetsIds().add(petProfile.getId());
-            CurrentPet.getInstance().setPetProfile(petProfile.getId());
-            DBCrud.getInstance().setPetInDB(petProfile.getId(), petProfile);
-            DBCrud.getInstance().setUserInDB(CurrentUser.getInstance().getUid(), CurrentUser.getInstance().getUserProfile());
-            finish();
-        }
-        else
-            Toast.makeText(this, "Please upload the image", Toast.LENGTH_SHORT).show();
-    }
-
     private void uploadImage() {
-        progressDialog = new ProgressDialog(this);
-        progressDialog.setTitle("Uploading image and saving data");
-
+        // TODO: start show progress bar (loading)
         this.fileName = petProfile.getId();
         StorageReference reference = storageReference.child(this.fileName);
         reference.putFile(imageUri)
-                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                    @Override
-                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                        taskSnapshot.getStorage().getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
-                            @Override
-                            public void onComplete(@NonNull Task<Uri> task) {
-                                imageUrl = task.getResult().toString();
-                                setImageUploaded();
-                            }
-                        });
-                        pet_IMG_profile.setImageURI(null);
-                        if(progressDialog.isShowing())
-                            progressDialog.dismiss();
-                        Toast.makeText(PetProfileActivity.this, "Image Uploaded", Toast.LENGTH_SHORT).show();
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        if(progressDialog.isShowing())
-                            progressDialog.dismiss();
-                        Toast.makeText(PetProfileActivity.this, "Failed Uploaded Image", Toast.LENGTH_SHORT).show();
-                    }
+                .addOnSuccessListener(taskSnapshot -> {
+                    taskSnapshot.getStorage().getDownloadUrl().addOnCompleteListener(task -> {
+                        imageUrl = task.getResult().toString();
+                        setImageUploaded();
+                    });
+                    pet_IMG_profile.setImageURI(null);
+                    // TODO: stop show progress bar
+                    Toast.makeText(PetProfileActivity.this, "Image Uploaded", Toast.LENGTH_SHORT).show();
+                }).addOnFailureListener(e -> {
+                    // TODO: stop show progress bar
+                    Toast.makeText(PetProfileActivity.this, "Failed Uploaded Image", Toast.LENGTH_SHORT).show();
                 });
     }
-
     private void checkPermissionAndUploadImage() {
         // Check if permission to read external storage is granted
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_IMAGES)
@@ -217,23 +190,30 @@ public class PetProfileActivity extends AppCompatActivity {
         }
     }
 
+//    private void openImagePicker() {
+//        Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+//        intent.setType("image/*");
+//        intent.setAction(Intent.ACTION_GET_CONTENT);
+//        startActivityForResult(intent, IMAGE_UPLOAD_REQUEST_CODE);
+//    }
+
     private void openImagePicker() {
         Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         intent.setType("image/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(intent, IMAGE_UPLOAD_REQUEST_CODE);
+        imagePickerLauncher.launch(intent);
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == IMAGE_UPLOAD_REQUEST_CODE && resultCode == RESULT_OK && data!= null && data.getData() != null) {
-            // Get the URI of the selected image
-            setImageNotUploaded();
-            imageUri = data.getData();
-            pet_IMG_profile.setImageURI(imageUri);
-        }
-    }
+//    @Override
+//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+//        super.onActivityResult(requestCode, resultCode, data);
+//        if (requestCode == IMAGE_UPLOAD_REQUEST_CODE && resultCode == RESULT_OK && data!= null && data.getData() != null) {
+//            // Get the URI of the selected image
+//            setImageNotUploaded();
+//            imageUri = data.getData();
+//            pet_IMG_profile.setImageURI(imageUri);
+//        }
+//    }
 
     private void setImageUploaded() {
         isImageUploaded = true;

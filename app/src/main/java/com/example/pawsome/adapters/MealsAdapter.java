@@ -14,7 +14,6 @@ import com.bumptech.glide.Glide;
 import com.example.pawsome.Callbacks.MealCallback;
 import com.example.pawsome.R;
 import com.example.pawsome.model.Meal;
-import com.example.pawsome.model.adam_delete.Group;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textview.MaterialTextView;
 
@@ -104,12 +103,12 @@ public class MealsAdapter extends RecyclerView.Adapter<MealsAdapter.MealViewHold
         }
 
         private void initViews() {
-            meal_TV_time = itemView.findViewById(R.id.group_TV_groupName);
-            meal_TV_date = itemView.findViewById(R.id.group_TV_game);
-            meal_TV_food_details = itemView.findViewById(R.id.group_TV_groupDescription);
-            meal_TV_note = itemView.findViewById(R.id.group_TV_capacity);
-            meal_BTN_delete = itemView.findViewById(R.id.group_BTN_join);
-            meal_IMG_user = itemView.findViewById(R.id.group_IMG_game);
+//            meal_TV_time = itemView.findViewById(R.id.group_TV_groupName);
+//            meal_TV_date = itemView.findViewById(R.id.group_TV_game);
+//            meal_TV_food_details = itemView.findViewById(R.id.group_TV_groupDescription);
+//            meal_TV_note = itemView.findViewById(R.id.group_TV_capacity);
+//            meal_BTN_delete = itemView.findViewById(R.id.group_BTN_join);
+//            meal_IMG_user = itemView.findViewById(R.id.group_IMG_game);
         }
     }
 }

@@ -3,22 +3,26 @@
 
 
     <item
-        android:id="@+id/navigation_home"
+        android:id="@+id/menu_FRG_home"
         android:icon="@drawable/ic_home"
-        android:title="@string/title_home" />
+        android:title="Home" />
 
     <item
-        android:id="@+id/navigation_dashboard"
-        android:icon="@drawable/ic_my_groups"
-        android:title="@string/title_my_groups" />
+        android:id="@+id/menu_FRG_meals"
+        android:icon="@drawable/ic_menu_food"
+        android:title="Food Log" />
 
     <item
-        android:id="@+id/navigation_create_a_group"
-        android:icon="@drawable/ic_create_group"
-        android:title="@string/title_create_a_group" />
+        android:id="@+id/menu_FRG_add"
+        android:icon="@drawable/ic_menu_plus"
+        android:title="Add" />
     <item
-        android:id="@+id/navigation_favorite_games"
-        android:icon="@drawable/ic_star_full"
-        android:title="@string/title_favorite_games" />
+        android:id="@+id/menu_FRG_walks"
+        android:icon="@drawable/ic_menu_poop"
+        android:title="Walks Log" />
+    <item
+        android:id="@+id/menu_FRG_settings"
+        android:icon="@drawable/ic_menu_settings"
+        android:title="Settings" />
 
 </menu>
