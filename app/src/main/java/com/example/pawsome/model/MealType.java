@@ -5,17 +5,16 @@ import java.time.format.DateTimeFormatter;
 
 public class MealType {
 
-    private LocalTime time;
+    private long time;
     private int amount;
     private String unit;
     private String foodType;
     private String name;
 
-
     public MealType() {
     }
 
-    public MealType(LocalTime time, int amount, String unit, String foodType, String name) {
+    public MealType(long time, int amount, String unit, String foodType, String name) {
         this.time = time;
         this.amount = amount;
         this.unit = unit;
@@ -23,11 +22,11 @@ public class MealType {
         this.name = name;
     }
 
-    public LocalTime getTime() {
+    public long getTime() {
         return time;
     }
 
-    public MealType setTime(LocalTime time) {
+    public MealType setTime(long time) {
         this.time = time;
         return this;
     }
@@ -68,9 +67,17 @@ public class MealType {
         return this;
     }
 
-    public String getTimeString(){
-        if (time == null)
-            return "NA";
-        return time.format(DateTimeFormatter.ofPattern("HH:mm"));
+    public String getTimeAsString() {
+        LocalTime time = LocalTime.ofSecondOfDay(this.time);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+        return time.format(formatter);
     }
+
+    public MealType setTimeFromString(String timeString) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+        this.time = LocalTime.parse(timeString, formatter).toSecondOfDay();
+        return this;
+    }
+
+
 }

@@ -13,11 +13,15 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class CurrentPet {
 
     private static CurrentPet currentPet = null;
     private PetProfile petProfile = null;
     private ValueEventListener petProfileListener;
+    private final List<PetProfileObserver> observers = new ArrayList<>();
 
     private CurrentPet() {
     }
@@ -34,6 +38,7 @@ public class CurrentPet {
 
     public CurrentPet setPetProfile(PetProfile petProfile) {
         this.petProfile = petProfile;
+        notifyObservers();
         return this;
     }
 
@@ -48,7 +53,7 @@ public class CurrentPet {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
                     petProfile = (snapshot.getValue(PetProfile.class));
-                    Log.d("pet_null", "loadPetProfile: CurrentPet = " + petProfile);
+                    notifyObservers();
                 }
                 else {
                     Log.d("pet_null", "loadPetProfile: PetId = " + petId + " does not exist");
@@ -63,5 +68,19 @@ public class CurrentPet {
 
     public String getPetId() {
         return petProfile.getId();
+    }
+
+    public void addObserver(PetProfileObserver observer) {
+        observers.add(observer);
+    }
+
+    public void removeObserver(PetProfileObserver observer) {
+        observers.remove(observer);
+    }
+
+    private void notifyObservers() {
+        for (PetProfileObserver observer : observers) {
+            observer.onPetProfileChanged();
+        }
     }
 }

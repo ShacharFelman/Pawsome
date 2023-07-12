@@ -13,8 +13,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.pawsome.callbacks.MealCallback;
 import com.example.pawsome.R;
+import com.example.pawsome.current_state.CurrentUser;
 import com.example.pawsome.model.Meal;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.textview.MaterialTextView;
 
 import java.time.format.DateTimeFormatter;
@@ -57,11 +59,16 @@ public class MealsAdapter extends RecyclerView.Adapter<MealsAdapter.MealViewHold
         holder.meal_TV_time.setText(meal.getDateTimeAsLocalDateTime().format(DateTimeFormatter.ofPattern("HH:mm")));
         holder.meal_TV_date.setText(meal.getDateTimeAsLocalDateTime().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
         holder.meal_TV_note.setText(meal.getNote());
-        holder.meal_TV_type.setText(meal.getMealType());
+        holder.meal_TV_type.setText(meal.getMealType().getName());
         Glide.
                 with(fragment.getContext()).
                 load(meal.getOwner().getProfileImage()).
                 into(holder.meal_IMG_user);
+
+        if(meal.getOwner().getUid().equals(CurrentUser.getInstance().getUid()))
+            holder.meal_CV_item.setStrokeWidth(0);
+        else
+            holder.meal_CV_item.setStrokeWidth(2);
     }
 
     private Meal getItem(int position) {
@@ -97,6 +104,7 @@ public class MealsAdapter extends RecyclerView.Adapter<MealsAdapter.MealViewHold
         private MaterialTextView meal_TV_type;
         private MaterialTextView meal_TV_note;
         private MaterialButton meal_BTN_delete;
+        private MaterialCardView meal_CV_item;
 
         public MealViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -112,6 +120,7 @@ public class MealsAdapter extends RecyclerView.Adapter<MealsAdapter.MealViewHold
             meal_TV_type = itemView.findViewById(R.id.meal_TV_type);
             meal_TV_note = itemView.findViewById(R.id.meal_TV_note);
             meal_BTN_delete = itemView.findViewById(R.id.meal_BTN_delete);
+            meal_CV_item = itemView.findViewById(R.id.meal_CV_item);
         }
     }
 }

@@ -12,14 +12,14 @@ import android.view.ViewGroup;
 
 import com.example.pawsome.adapters.MealsAdapter;
 import com.example.pawsome.current_state.CurrentPet;
-import com.example.pawsome.current_state.CurrentUser;
+import com.example.pawsome.current_state.PetProfileObserver;
 import com.example.pawsome.databinding.FragmentMealLogBinding;
 import com.example.pawsome.model.Meal;
-import com.example.pawsome.view.activity.MainActivity;
 
+import java.util.Comparator;
 import java.util.List;
 
-public class MealLogFragment extends Fragment {
+public class MealLogFragment extends Fragment implements PetProfileObserver {
     private FragmentMealLogBinding binding;
     private MealsAdapter mealsAdapter;
     private List<Meal> meals;
@@ -29,28 +29,31 @@ public class MealLogFragment extends Fragment {
         binding = FragmentMealLogBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        initMealsList();
-        initViews();
-//        setCallbacks();
-        initListeners();
+        CurrentPet.getInstance().addObserver(this);
+
+        if(CurrentPet.getInstance().getPetProfile() != null)
+            updateFragmentData();
+
         return root;
     }
 
-//    private void initFragmentData() {
-//        initViews();
-//        setCallbacks();
-//        initListeners();
-//    }
+    private void updateFragmentData() {
+        getMealsList();
+        setMealsListView();
+        initListeners();
+    }
 
     private void initListeners() {
     }
 
-    private void initMealsList() {
-        if(CurrentPet.getInstance().getPetProfile() != null)
+    private void getMealsList() {
+        if (CurrentPet.getInstance().getPetProfile() != null) {
             this.meals = CurrentPet.getInstance().getPetProfile().getMeals();
+            this.meals.sort(Comparator.comparingLong(Meal::getDateTime).reversed());
+        }
     }
 
-    private void initViews() {
+    private void setMealsListView() {
         if (meals == null || meals.isEmpty()) {
             binding.mealsLogLSTMeals.setVisibility(View.GONE);
             binding.mealsLogTVEmpty.setVisibility(View.VISIBLE);
@@ -64,41 +67,20 @@ public class MealLogFragment extends Fragment {
         binding.mealsLogLSTMeals.setAdapter(mealsAdapter);
     }
 
-//    private void setCallbacks() {
-//        offerAdapter.setOfferCallback(new OfferCallback() {
-//            @Override
-//            public void joinClicked(Offer offer, int position) {
-//                if (offer.getCapacity() <= offer.getNumOfUsers()) {
-//                    SignalSingleton.getInstance().toast("The group is full");
-//                } else {
-//                    CurrentUser.getInstance().getUserProfile().getOffers().put(offer.getId(), offer);
-//                    offer.addUser(CurrentUser.getInstance().getUserProfile().getUid());
-////                    databaseRef = FirebaseDatabase.getInstance().getReference(Constants.DB_USERS);
-////                    databaseRef.child(CurrentUser.getInstance().getUserProfile().getUid()).setValue(CurrentUser.getInstance().getUserProfile());
-//                    offerAdapter.removeOffer(offer.getId());
-//                    offerAdapter.notifyItemRemoved(position);
-//                }
-//            }
-//
-//            @Override
-//            public void itemClicked(Offer offer, int position) {
-//                //move to the offer page with the offer details
-//            }
-//
-////            @Override
-////            public void leaveClicked(Offer item, int position) {}
-//        });
-//
-//    }
-
     @Override
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
+        CurrentPet.getInstance().removeObserver(this);
     }
 
     @Override
     public void onPause() {
         super.onPause();
+    }
+
+    @Override
+    public void onPetProfileChanged() {
+        updateFragmentData();
     }
 }

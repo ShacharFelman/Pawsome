@@ -34,6 +34,9 @@
 
     <string name="img_desc_meal_icon">Meal icon</string>
     <string name="prompt_empty_meals_list">No meals to show</string>
+    <string name="title_add_meal_type">Add Meal Type</string>
+    <string name="hint_meal_name">Meal name</string>
+    <string name="hint_time">Meal Time</string>
 
     <string-array name="Gender">
         <item>Male</item>

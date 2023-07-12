@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/meal_CV_item"
     android:layout_width="match_parent"
     android:layout_height="120dp"
     app:cardCornerRadius="20dp"
     app:cardElevation="10dp"
     android:layout_marginVertical="5dp"
-    android:layout_marginHorizontal="2dp">
+    android:layout_marginHorizontal="2dp"
+    app:strokeColor="@color/colorPrimary"
+    app:strokeWidth="2dp">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -144,4 +147,4 @@
     </RelativeLayout>
 
 
-</androidx.cardview.widget.CardView>
+</com.google.android.material.card.MaterialCardView>

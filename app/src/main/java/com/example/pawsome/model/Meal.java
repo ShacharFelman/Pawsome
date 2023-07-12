@@ -10,29 +10,17 @@ import java.util.UUID;
 
 public class Meal {
 
-    private String id;
     private UserProfile owner;
     private String petId;
-//    private LocalDateTime dateTime;
     private long dateTime;
+    private String note;
+    private MealType mealType;
 
     private int amount;
     private String unit;
     private String foodType;
-    private String note;
-    private String mealType;
 
     public Meal() {
-        this.id = UUID.randomUUID().toString();
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public Meal setId(String id) {
-        this.id = id;
-        return this;
     }
 
     public UserProfile getOwner() {
@@ -50,6 +38,43 @@ public class Meal {
 
     public Meal setDateTime(long dateTime) {
         this.dateTime = dateTime;
+        return this;
+    }
+
+    public String getNote() {
+        return note;
+    }
+
+    public Meal setNote(String note) {
+        this.note = note;
+        return this;
+    }
+
+    public String getPetId() {
+        return petId;
+    }
+
+    public Meal setPetId(String petId) {
+        this.petId = petId;
+        return this;
+    }
+
+    public MealType getMealType() {
+        return mealType;
+    }
+
+    public Meal setMealType(MealType mealType) {
+        this.mealType = mealType;
+        return this;
+    }
+
+    public LocalDateTime getDateTimeAsLocalDateTime() {
+        return LocalDateTime.ofInstant(Instant.ofEpochMilli(this.dateTime), ZoneId.systemDefault());
+    }
+
+    public Meal setDateTimeAsLocalDateTime(LocalDateTime dateTime) {
+        ZonedDateTime zdt = ZonedDateTime.of(dateTime, ZoneId.systemDefault());
+        this.dateTime = zdt.toInstant().toEpochMilli();
         return this;
     }
 
@@ -80,48 +105,34 @@ public class Meal {
         return this;
     }
 
-    public String getNote() {
-        return note;
+    @Override
+    public String toString() {
+        return "Meal{" +
+                "owner=" + owner +
+                ", petId='" + petId + '\'' +
+                ", dateTime=" + dateTime +
+                ", note='" + note + '\'' +
+                ", mealType=" + mealType +
+                ", amount=" + amount +
+                ", unit='" + unit + '\'' +
+                ", foodType='" + foodType + '\'' +
+                '}';
     }
 
-    public Meal setNote(String note) {
-        this.note = note;
+    public Meal setMealDefaultDataFromMealType() {
+        if(this.mealType != null) {
+            this.amount = this.mealType.getAmount();
+            this.unit = this.mealType.getUnit();
+            this.foodType = this.mealType.getFoodType();
+        }
+
         return this;
     }
 
-    public String getPetId() {
-        return petId;
-    }
-
-    public Meal setPetId(String petId) {
-        this.petId = petId;
-        return this;
-    }
-
-    public String getMealType() {
-        return mealType;
-    }
-
-    public Meal setMealType(String mealType) {
-        this.mealType = mealType;
-        return this;
-    }
-
-    public LocalDateTime getDateTimeAsLocalDateTime() {
-        Instant instant = Instant.ofEpochMilli(this.dateTime);
-        LocalDateTime localDateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
-//
-//        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-//        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
-//
-//        String date = localDateTime.format(dateFormatter);
-//        String time = localDateTime.format(timeFormatter);
-        return localDateTime;
-    }
-
-    public Meal setDateTimeAsLocalDateTime(LocalDateTime dateTime) {
-        ZonedDateTime zdt = ZonedDateTime.of(dateTime, ZoneId.systemDefault());
-        this.dateTime = zdt.toInstant().toEpochMilli();
+    public Meal setMealDefaultDataFromMealType(MealType mealType) {
+        this.amount = mealType.getAmount();
+        this.unit = mealType.getUnit();
+        this.foodType = mealType.getFoodType();
         return this;
     }
 }

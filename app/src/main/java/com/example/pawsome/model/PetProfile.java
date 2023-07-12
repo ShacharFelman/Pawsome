@@ -24,9 +24,6 @@ public class PetProfile {
     // TODO: change to walks
     private Map<LocalDateTime, String> walksIds;
     private List<Meal> meals;
-    private String defaultFoodType;
-    private String defaultFoodAmount;
-    private String defaultWalkDuration;
 
 
     public PetProfile() {
@@ -130,11 +127,11 @@ public class PetProfile {
         return this;
     }
 
-    public List<MealType> getMealPrefs() {
+    public List<MealType> getMealTypes() {
         return mealTypes;
     }
 
-    public PetProfile setMealPrefs(List<MealType> mealTypes) {
+    public PetProfile setMealTypes(List<MealType> mealTypes) {
         this.mealTypes = mealTypes;
         return this;
     }
@@ -159,33 +156,6 @@ public class PetProfile {
 
     public PetProfile addOwner(String ownerId) {
         this.ownersIds.add(ownerId);
-        return this;
-    }
-
-    public String getDefaultFoodType() {
-        return defaultFoodType;
-    }
-
-    public PetProfile setDefaultFoodType(String defaultFoodType) {
-        this.defaultFoodType = defaultFoodType;
-        return this;
-    }
-
-    public String getDefaultFoodAmount() {
-        return defaultFoodAmount;
-    }
-
-    public PetProfile setDefaultFoodAmount(String defaultFoodAmount) {
-        this.defaultFoodAmount = defaultFoodAmount;
-        return this;
-    }
-
-    public String getDefaultWalkDuration() {
-        return defaultWalkDuration;
-    }
-
-    public PetProfile setDefaultWalkDuration(String defaultWalkDuration) {
-        this.defaultWalkDuration = defaultWalkDuration;
         return this;
     }
 

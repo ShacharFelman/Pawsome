@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
         main_BNV_menu.setSelectedItemId(R.id.menu_FRG_home);
 
         // TODO: remove this
-        addHardCodedMealsData();
+//        addHardCodedMealsData();
     }
 
     private void initViews() {
@@ -116,26 +116,26 @@ public class MainActivity extends AppCompatActivity {
         finish();
     }
 
-    public void addHardCodedMealsData() {
-        Log.d("pet_null", "addHardCodedMealsData: CurrentPet = " + CurrentPet.getInstance().getPetProfile());
-        if(CurrentPet.getInstance().getPetProfile() == null)
-            return;
-
-        for (int i = 0; i < 10; i++) {
-            Meal meal = new Meal();
-            meal
-                    .setOwner(CurrentUser.getInstance().getUserProfile())
-                    .setPetId(CurrentPet.getInstance().getPetId())
-                    .setDateTime(System.currentTimeMillis() - (i * 1000 * 60))
-                    .setAmount(100 + i)
-                    .setUnit("grams")
-                    .setFoodType("Proplan Salmon")
-                    .setMealType(i % 3 == 0 ? "breakfast" : i % 3 == 1 ? "launch" : "dinner")
-                    .setNote("hello " + i);
-
-            CurrentPet.getInstance().getPetProfile().addMeal(meal);
-        }
-
-        DBCrud.getInstance().setPetInDB(CurrentPet.getInstance().getPetProfile());
-    }
+//    public void addHardCodedMealsData() {
+//        Log.d("pet_null", "addHardCodedMealsData: CurrentPet = " + CurrentPet.getInstance().getPetProfile());
+//        if(CurrentPet.getInstance().getPetProfile() == null)
+//            return;
+//
+//        for (int i = 0; i < 10; i++) {
+//            Meal meal = new Meal();
+//            meal
+//                    .setOwner(CurrentUser.getInstance().getUserProfile())
+//                    .setPetId(CurrentPet.getInstance().getPetId())
+//                    .setDateTime(System.currentTimeMillis() - (i * 1000 * 60))
+//                    .setAmount(100 + i)
+//                    .setUnit("grams")
+//                    .setFoodType("Proplan Salmon")
+//                    .setMealType(i % 3 == 0 ? "breakfast" : i % 3 == 1 ? "launch" : "dinner")
+//                    .setNote("hello " + i);
+//
+//            CurrentPet.getInstance().getPetProfile().addMeal(meal);
+//        }
+//
+//        DBCrud.getInstance().setPetInDB(CurrentPet.getInstance().getPetProfile());
+//    }
 }

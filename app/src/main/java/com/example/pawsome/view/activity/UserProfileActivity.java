@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
@@ -56,6 +58,7 @@ public class UserProfileActivity extends AppCompatActivity {
 
         initViews();
         setButtonsListener();
+        setTextChangedListener();
         initImagePickerLauncher();
         initUserProfileData();
         setImageUploaded();
@@ -87,6 +90,50 @@ public class UserProfileActivity extends AppCompatActivity {
         profile_BTN_home.setOnClickListener(v -> goToMainActivity());
     }
 
+    private void setTextChangedListener() {
+        profile_EDT_name.getEditText().addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+            @Override
+            public void onTextChanged(CharSequence name, int start, int before, int count) {
+                if(!profile_EDT_name.getEditText().getText().toString().isEmpty())
+                    profile_EDT_name.setError(null);
+            }
+            @Override
+            public void afterTextChanged(Editable s) { }
+        });
+
+        profile_EDT_phone.getEditText().addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+            @Override
+            public void onTextChanged(CharSequence amount, int start, int before, int count) {
+                if(!profile_EDT_phone.getEditText().getText().toString().isEmpty())
+                    profile_EDT_phone.setError(null);
+            }
+            @Override
+            public void afterTextChanged(Editable s) { }
+        });
+    }
+
+
+    private boolean validateFields() {
+        if(profile_EDT_name.getEditText().getText().toString().isEmpty()) {
+            profile_EDT_name.setError("Name is required!");
+            return false;
+        }
+        if (profile_EDT_phone.getEditText().getText().toString().isEmpty()) {
+            profile_EDT_phone.setError("Phone is required!");
+            return false;
+        }
+        if(!isImageUploaded) {
+            Toast.makeText(this, "Please upload the image", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
+        return true;
+    }
+
     private void initImagePickerLauncher() {
         imagePickerLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
@@ -116,7 +163,9 @@ public class UserProfileActivity extends AppCompatActivity {
     }
 
     private void updateUserProfile(String imageUrl) {
-        if (isImageUploaded) {
+        if (!validateFields())
+            return;
+
             UserProfile userProfile = CurrentUser.getInstance().getUserProfile();
             String phone = profile_EDT_phone.getEditText().getText().toString();
             String name = profile_EDT_name.getEditText().getText().toString();
@@ -128,9 +177,6 @@ public class UserProfileActivity extends AppCompatActivity {
 
             FirebaseDB.getInstance().getUsersReference().child(userProfile.getUid()).setValue(userProfile);
             profileSaved();
-        }
-        else
-            Toast.makeText(this, "Please upload the image", Toast.LENGTH_SHORT).show();
     }
 
     private void uploadImage() {
