@@ -20,7 +20,9 @@
     <color name="colorPrimary">#EB762B</color>
     <color name="colorPrimaryDark">#E26A29</color>
     <color name="colorPrimaryLight">#FFB54F</color>
-    <color name="colorRecycleItemText">#000000</color>
+    <color name="colorRecycleItemPrimaryText">#000000</color>
+    <color name="colorRecycleItemSecondaryText">#959BA2</color>
+
 
 
 </resources>

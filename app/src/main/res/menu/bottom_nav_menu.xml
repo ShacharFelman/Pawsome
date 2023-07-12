@@ -9,7 +9,7 @@
 
     <item
         android:id="@+id/menu_FRG_meals"
-        android:icon="@drawable/ic_menu_food"
+        android:icon="@drawable/ic_menu_meal"
         android:title="Food Log" />
 
     <item
