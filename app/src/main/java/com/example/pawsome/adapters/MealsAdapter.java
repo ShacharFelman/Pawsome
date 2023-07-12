@@ -19,19 +19,21 @@ import com.google.android.material.textview.MaterialTextView;
 
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 
 public class MealsAdapter extends RecyclerView.Adapter<MealsAdapter.MealViewHolder> {
 
     private final Fragment fragment;
-    private HashMap<String, Meal> allMealsList;
+    private List<Meal> mealsList;
 
 
     private MealCallback mealCallback;
 
 
-    public MealsAdapter(Fragment fragment) {
-        this.allMealsList = new HashMap<>();
+    public MealsAdapter(Fragment fragment, List<Meal> mealsList) {
+        this.mealsList = mealsList;
         this.fragment = fragment;
     }
 
@@ -51,10 +53,11 @@ public class MealsAdapter extends RecyclerView.Adapter<MealsAdapter.MealViewHold
     @Override
     public void onBindViewHolder(@NonNull MealViewHolder holder, int position) {
         Meal meal = getItem(position);
-        holder.meal_TV_time.setText(meal.getDateTime().format(DateTimeFormatter.ofPattern("HH:mm")));
-        holder.meal_TV_date.setText(meal.getDateTime().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
-        holder.meal_TV_food_details.setText(meal.getAmount() + " " + meal.getUnit() + "(" + meal.getFoodType() + ")");
+        holder.meal_TV_user.setText(meal.getOwner().getName());
+        holder.meal_TV_time.setText(meal.getDateTimeAsLocalDateTime().format(DateTimeFormatter.ofPattern("HH:mm")));
+        holder.meal_TV_date.setText(meal.getDateTimeAsLocalDateTime().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
         holder.meal_TV_note.setText(meal.getNote());
+        holder.meal_TV_type.setText(meal.getMealType());
         Glide.
                 with(fragment.getContext()).
                 load(meal.getOwner().getProfileImage()).
@@ -62,37 +65,36 @@ public class MealsAdapter extends RecyclerView.Adapter<MealsAdapter.MealViewHold
     }
 
     private Meal getItem(int position) {
-        ArrayList<Meal> mealsValues = new ArrayList<>(allMealsList.values());
-        return mealsValues.get(position);
+        return mealsList.get(position);
     }
 
     @Override
     public int getItemCount() {
-        return allMealsList == null ? 0 : allMealsList.size();
+        return mealsList == null ? 0 : mealsList.size();
     }
 
-    public void updateMeals(HashMap<String, Meal> meals) {
-        this.allMealsList = meals;
+    public void updateMeals(List<Meal> mealsList) {
+        this.mealsList = mealsList;
         notifyDataSetChanged();
     }
 
+//    public void deleteMeal(String mealId) {
+//        if (mealsList.containsKey(mealId))
+//            mealsList.remove(mealId);
+//        notifyDataSetChanged();
+//    }
 
-    public void deleteMeal(String mealId) {
-        if (allMealsList.containsKey(mealId))
-            allMealsList.remove(mealId);
-        notifyDataSetChanged();
-    }
-
-
-    public HashMap<String, Meal> getAllMealsList() {
-        return allMealsList;
+    public List<Meal> getMealsList() {
+        mealsList.sort(Comparator.comparing(Meal::getDateTime).reversed());
+        return mealsList;
     }
 
     public class MealViewHolder extends RecyclerView.ViewHolder {
         private ImageView meal_IMG_user;
+        private MaterialTextView meal_TV_user;
         private MaterialTextView meal_TV_time;
         private MaterialTextView meal_TV_date;
-        private MaterialTextView meal_TV_food_details;
+        private MaterialTextView meal_TV_type;
         private MaterialTextView meal_TV_note;
         private MaterialButton meal_BTN_delete;
 
@@ -103,12 +105,13 @@ public class MealsAdapter extends RecyclerView.Adapter<MealsAdapter.MealViewHold
         }
 
         private void initViews() {
-//            meal_TV_time = itemView.findViewById(R.id.group_TV_groupName);
-//            meal_TV_date = itemView.findViewById(R.id.group_TV_game);
-//            meal_TV_food_details = itemView.findViewById(R.id.group_TV_groupDescription);
-//            meal_TV_note = itemView.findViewById(R.id.group_TV_capacity);
-//            meal_BTN_delete = itemView.findViewById(R.id.group_BTN_join);
-//            meal_IMG_user = itemView.findViewById(R.id.group_IMG_game);
+            meal_IMG_user = itemView.findViewById(R.id.meal_IMG_user);
+            meal_TV_user = itemView.findViewById(R.id.meal_TV_user);
+            meal_TV_time = itemView.findViewById(R.id.meal_TV_time);
+            meal_TV_date = itemView.findViewById(R.id.meal_TV_date);
+            meal_TV_type = itemView.findViewById(R.id.meal_TV_type);
+            meal_TV_note = itemView.findViewById(R.id.meal_TV_note);
+            meal_BTN_delete = itemView.findViewById(R.id.meal_BTN_delete);
         }
     }
 }

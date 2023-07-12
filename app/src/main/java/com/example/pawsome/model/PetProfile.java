@@ -1,5 +1,7 @@
 package com.example.pawsome.model;
 
+import com.example.pawsome.utils.Constants;
+
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -19,8 +21,9 @@ public class PetProfile {
     // TODO: change to walkType
     private List<LocalTime> WalksTimes;
     private List<MealType> mealTypes;
+    // TODO: change to walks
     private Map<LocalDateTime, String> walksIds;
-    private Map<LocalDateTime, String> mealsIds;
+    private List<Meal> meals;
     private String defaultFoodType;
     private String defaultFoodAmount;
     private String defaultWalkDuration;
@@ -32,13 +35,14 @@ public class PetProfile {
         this.WalksTimes = new ArrayList<>();
         this.mealTypes = new ArrayList<>();
         this.walksIds = new HashMap<>();
-        this.mealsIds = new HashMap<>();
+        this.meals = new ArrayList<>();
+        this.profileImage = Constants.DEFAULT_USER_IMAGE_URL;
     }
 
     public PetProfile(String name, String gender, String ownerId, String dateOfBirth, List<LocalTime> walksTimes, List<MealType> mealTypes) {
         this.id = UUID.randomUUID().toString();
         this.name = name;
-        this.profileImage = "https://static.thenounproject.com/png/13421-200.png";
+        this.profileImage = Constants.DEFAULT_PET_IMAGE_URL;
         this.gender = gender;
         this.dateOfBirth = dateOfBirth;
         this.WalksTimes = walksTimes == null ? new ArrayList<>() : walksTimes;
@@ -46,13 +50,13 @@ public class PetProfile {
         this.ownersIds = new ArrayList<>();
         this.ownersIds.add(ownerId);
         this.walksIds = new HashMap<>();
-        this.mealsIds = new HashMap<>();
+        this.meals = new ArrayList<>();
     }
 
     public PetProfile(String name, String gender, String ownerId, String dateOfBirth) {
         this.id = UUID.randomUUID().toString();
         this.name = name;
-        this.profileImage = "https://static.thenounproject.com/png/13421-200.png";
+        this.profileImage = Constants.DEFAULT_PET_IMAGE_URL;
         this.gender = gender;
         this.dateOfBirth = dateOfBirth;
         this.WalksTimes = new ArrayList<>();
@@ -60,7 +64,7 @@ public class PetProfile {
         this.ownersIds = new ArrayList<>();
         this.ownersIds.add(ownerId);
         this.walksIds = new HashMap<>();
-        this.mealsIds = new HashMap<>();
+        this.meals = new ArrayList<>();
     }
 
     public String getId() {
@@ -144,12 +148,12 @@ public class PetProfile {
         return this;
     }
 
-    public Map<LocalDateTime, String> getMealsIds() {
-        return mealsIds;
+    public List<Meal> getMeals() {
+        return meals;
     }
 
-    public PetProfile setMealsIds(Map<LocalDateTime, String> mealsIds) {
-        this.mealsIds = mealsIds;
+    public PetProfile setMeals(List<Meal> meals) {
+        this.meals = meals;
         return this;
     }
 
@@ -183,5 +187,9 @@ public class PetProfile {
     public PetProfile setDefaultWalkDuration(String defaultWalkDuration) {
         this.defaultWalkDuration = defaultWalkDuration;
         return this;
+    }
+
+    public void addMeal(Meal meal) {
+        this.meals.add(meal);
     }
 }

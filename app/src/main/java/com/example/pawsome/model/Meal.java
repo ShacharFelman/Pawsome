@@ -1,6 +1,11 @@
 package com.example.pawsome.model;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 
 public class Meal {
@@ -8,11 +13,14 @@ public class Meal {
     private String id;
     private UserProfile owner;
     private String petId;
-    private LocalDateTime dateTime;
+//    private LocalDateTime dateTime;
+    private long dateTime;
+
     private int amount;
     private String unit;
     private String foodType;
     private String note;
+    private String mealType;
 
     public Meal() {
         this.id = UUID.randomUUID().toString();
@@ -36,11 +44,11 @@ public class Meal {
         return this;
     }
 
-    public LocalDateTime getDateTime() {
+    public long getDateTime() {
         return dateTime;
     }
 
-    public Meal setDateTime(LocalDateTime dateTime) {
+    public Meal setDateTime(long dateTime) {
         this.dateTime = dateTime;
         return this;
     }
@@ -87,6 +95,33 @@ public class Meal {
 
     public Meal setPetId(String petId) {
         this.petId = petId;
+        return this;
+    }
+
+    public String getMealType() {
+        return mealType;
+    }
+
+    public Meal setMealType(String mealType) {
+        this.mealType = mealType;
+        return this;
+    }
+
+    public LocalDateTime getDateTimeAsLocalDateTime() {
+        Instant instant = Instant.ofEpochMilli(this.dateTime);
+        LocalDateTime localDateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
+//
+//        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+//        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+//
+//        String date = localDateTime.format(dateFormatter);
+//        String time = localDateTime.format(timeFormatter);
+        return localDateTime;
+    }
+
+    public Meal setDateTimeAsLocalDateTime(LocalDateTime dateTime) {
+        ZonedDateTime zdt = ZonedDateTime.of(dateTime, ZoneId.systemDefault());
+        this.dateTime = zdt.toInstant().toEpochMilli();
         return this;
     }
 }

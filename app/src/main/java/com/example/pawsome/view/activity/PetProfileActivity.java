@@ -131,9 +131,9 @@ public class PetProfileActivity extends AppCompatActivity {
                     .setProfileImage(imageUrl);
 
             CurrentUser.getInstance().getUserProfile().getPetsIds().add(petProfile.getId());
-            CurrentPet.getInstance().setPetProfile(petProfile.getId());
-            DBCrud.getInstance().setPetInDB(petProfile.getId(), petProfile);
-            DBCrud.getInstance().setUserInDB(CurrentUser.getInstance().getUid(), CurrentUser.getInstance().getUserProfile());
+            CurrentPet.getInstance().setPetProfile(petProfile);
+            DBCrud.getInstance().setPetInDB(petProfile);
+            DBCrud.getInstance().setUserInDB(CurrentUser.getInstance().getUserProfile());
             goToMainActivity();
             finish();
         }

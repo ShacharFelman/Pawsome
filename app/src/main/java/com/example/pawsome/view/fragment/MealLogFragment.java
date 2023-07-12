@@ -2,65 +2,103 @@ package com.example.pawsome.view.fragment;
 
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.pawsome.R;
+import com.example.pawsome.adapters.MealsAdapter;
+import com.example.pawsome.current_state.CurrentPet;
+import com.example.pawsome.current_state.CurrentUser;
+import com.example.pawsome.databinding.FragmentMealLogBinding;
+import com.example.pawsome.model.Meal;
+import com.example.pawsome.view.activity.MainActivity;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link MealLogFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+import java.util.List;
+
 public class MealLogFragment extends Fragment {
+    private FragmentMealLogBinding binding;
+    private MealsAdapter mealsAdapter;
+    private List<Meal> meals;
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             ViewGroup container, Bundle savedInstanceState) {
+        binding = FragmentMealLogBinding.inflate(inflater, container, false);
+        View root = binding.getRoot();
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
-    public MealLogFragment() {
-        // Required empty public constructor
+        initMealsList();
+        initViews();
+//        setCallbacks();
+        initListeners();
+        return root;
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment FoodLogFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static MealLogFragment newInstance(String param1, String param2) {
-        MealLogFragment fragment = new MealLogFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
+//    private void initFragmentData() {
+//        initViews();
+//        setCallbacks();
+//        initListeners();
+//    }
+
+    private void initListeners() {
     }
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+    private void initMealsList() {
+        if(CurrentPet.getInstance().getPetProfile() != null)
+            this.meals = CurrentPet.getInstance().getPetProfile().getMeals();
+    }
+
+    private void initViews() {
+        if (meals == null || meals.isEmpty()) {
+            binding.mealsLogLSTMeals.setVisibility(View.GONE);
+            binding.mealsLogTVEmpty.setVisibility(View.VISIBLE);
+        } else {
+            binding.mealsLogLSTMeals.setVisibility(View.VISIBLE);
+            binding.mealsLogTVEmpty.setVisibility(View.GONE);
         }
+
+        mealsAdapter = new MealsAdapter(this, meals);
+        binding.mealsLogLSTMeals.setLayoutManager(new LinearLayoutManager(getContext()));
+        binding.mealsLogLSTMeals.setAdapter(mealsAdapter);
+    }
+
+//    private void setCallbacks() {
+//        offerAdapter.setOfferCallback(new OfferCallback() {
+//            @Override
+//            public void joinClicked(Offer offer, int position) {
+//                if (offer.getCapacity() <= offer.getNumOfUsers()) {
+//                    SignalSingleton.getInstance().toast("The group is full");
+//                } else {
+//                    CurrentUser.getInstance().getUserProfile().getOffers().put(offer.getId(), offer);
+//                    offer.addUser(CurrentUser.getInstance().getUserProfile().getUid());
+////                    databaseRef = FirebaseDatabase.getInstance().getReference(Constants.DB_USERS);
+////                    databaseRef.child(CurrentUser.getInstance().getUserProfile().getUid()).setValue(CurrentUser.getInstance().getUserProfile());
+//                    offerAdapter.removeOffer(offer.getId());
+//                    offerAdapter.notifyItemRemoved(position);
+//                }
+//            }
+//
+//            @Override
+//            public void itemClicked(Offer offer, int position) {
+//                //move to the offer page with the offer details
+//            }
+//
+////            @Override
+////            public void leaveClicked(Offer item, int position) {}
+//        });
+//
+//    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_meal_log, container, false);
+    public void onPause() {
+        super.onPause();
     }
 }

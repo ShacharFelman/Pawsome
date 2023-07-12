@@ -1,7 +1,10 @@
 package com.example.pawsome.current_state;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 
+import com.example.pawsome.dal.DBCrud;
 import com.example.pawsome.dal.FirebaseDB;
 import com.example.pawsome.model.UserProfile;
 import com.example.pawsome.utils.Constants;
@@ -42,12 +45,12 @@ public class CurrentUser {
     }
 
     private void loadUserProfile() {
-        DatabaseReference dbRef = FirebaseDB.getInstance().getDatabaseReference(Constants.DB_USERS);
-        dbRef.child(user.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+        DBCrud.getInstance().getUserReference(user.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
                     userProfile = (snapshot.getValue(UserProfile.class));
+                    setCurrentPet();
                 }
                 else
                     userProfile = null;
@@ -63,6 +66,14 @@ public class CurrentUser {
             return getUserProfile().getUid();
 
         return null;
+    }
+
+    public void setCurrentPet() {
+        Log.d("pet_null", "setCurrentPet: " + userProfile.getPetsIds());
+        if(userProfile.getPetsIds() == null || userProfile.getPetsIds().isEmpty())
+            return;
+
+        CurrentPet.getInstance().setPetProfileById(userProfile.getPetsIds().get(0));
     }
 
     @Override

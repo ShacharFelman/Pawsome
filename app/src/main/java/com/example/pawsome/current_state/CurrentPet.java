@@ -1,7 +1,10 @@
 package com.example.pawsome.current_state;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 
+import com.example.pawsome.dal.DBCrud;
 import com.example.pawsome.dal.FirebaseDB;
 import com.example.pawsome.model.PetProfile;
 import com.example.pawsome.utils.Constants;
@@ -29,20 +32,28 @@ public class CurrentPet {
         return petProfile;
     }
 
-    public CurrentPet setPetProfile(String petId) {
+    public CurrentPet setPetProfile(PetProfile petProfile) {
+        this.petProfile = petProfile;
+        return this;
+    }
+
+    public CurrentPet setPetProfileById(String petId) {
         loadPetProfile(petId);
         return this;
     }
 
     private void loadPetProfile(String petId) {
-        DatabaseReference dbRef = FirebaseDB.getInstance().getDatabaseReference(Constants.DB_PETS);
-        dbRef.child(petId).addListenerForSingleValueEvent(new ValueEventListener() {
+        DBCrud.getInstance().getPetReference(petId).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.exists())
+                if (snapshot.exists()) {
                     petProfile = (snapshot.getValue(PetProfile.class));
-                else
+                    Log.d("pet_null", "loadPetProfile: CurrentPet = " + petProfile);
+                }
+                else {
+                    Log.d("pet_null", "loadPetProfile: PetId = " + petId + " does not exist");
                     petProfile = null;
+                }
             }
             @Override
             public void onCancelled(@NonNull DatabaseError error) {

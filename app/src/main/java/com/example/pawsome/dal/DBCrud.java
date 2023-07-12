@@ -23,12 +23,20 @@ public class DBCrud {
         return instance;
     }
 
-    public void setUserInDB(String uid, UserProfile userProfile) {
-        usersDatabaseReference.child(uid).setValue(userProfile);
+    public void setUserInDB(UserProfile userProfile) {
+        usersDatabaseReference.child(userProfile.getUid()).setValue(userProfile);
     }
 
-    public void setPetInDB(String petId, PetProfile petProfile) {
-        petsDatabaseReference.child(petId).setValue(petProfile);
+    public void setPetInDB(PetProfile petProfile) {
+        petsDatabaseReference.child(petProfile.getId()).setValue(petProfile);
+    }
+
+    public DatabaseReference getUserReference(String uid) {
+        return usersDatabaseReference.child(uid);
+    }
+
+    public DatabaseReference getPetReference(String id) {
+        return petsDatabaseReference.child(id);
     }
 
 

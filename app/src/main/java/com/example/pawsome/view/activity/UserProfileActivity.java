@@ -107,10 +107,12 @@ public class UserProfileActivity extends AppCompatActivity {
             profile_EDT_name.getEditText().setText(userProfile.getName());
         if(userProfile.getPhoneNumber() != null && !userProfile.getPhoneNumber().isEmpty())
             profile_EDT_phone.getEditText().setText(userProfile.getPhoneNumber());
-        if(userProfile.getProfileImage() != null && !userProfile.getProfileImage().isEmpty())
+        if(userProfile.getProfileImage() != null && !userProfile.getProfileImage().isEmpty()) {
+            imageUrl = userProfile.getProfileImage();
             Glide.with(UserProfileActivity.this)
                     .load(userProfile.getProfileImage())
                     .into(profile_IMG_profile);
+        }
     }
 
     private void updateUserProfile(String imageUrl) {

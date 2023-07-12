@@ -6,10 +6,14 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.example.pawsome.R;
+import com.example.pawsome.current_state.CurrentPet;
+import com.example.pawsome.dal.DBCrud;
 import com.example.pawsome.dal.FirebaseDB;
 import com.example.pawsome.current_state.CurrentUser;
+import com.example.pawsome.model.PetProfile;
 import com.example.pawsome.model.UserProfile;
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract;
@@ -86,8 +90,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void loadUserProfile() {
-        DatabaseReference usersReference = FirebaseDB.getInstance().getUsersReference();
-        usersReference.child(firebaseUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+        DBCrud.getInstance().getUserReference(firebaseUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists())
@@ -97,12 +100,36 @@ public class LoginActivity extends AppCompatActivity {
 
                 if(!CurrentUser.getInstance().getUserProfile().getRegistered())
                     goToProfileActivity();
+                else if(CurrentUser.getInstance().getUserProfile().getPetsIds() != null && CurrentUser.getInstance().getUserProfile().getPetsIds().isEmpty()) {
+                    loadPetProfile(CurrentUser.getInstance().getUserProfile().getPetsIds().get(0));
+//                    goToMainActivity();
+                }
                 else
                     goToMainActivity();
             }
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
 
+            }
+        });
+    }
+
+    private void loadPetProfile(String petId) {
+        DBCrud.getInstance().getPetReference(petId).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    CurrentPet.getInstance().setPetProfile(snapshot.getValue(PetProfile.class));
+                    goToMainActivity();
+                    Log.d("pet_null", "loadPetProfile (login): CurrentPet = " + CurrentPet.getInstance().getPetProfile());
+                }
+                else {
+                    Log.d("pet_null", "loadPetProfile (login): PetId = " + petId + " does not exist");
+//                    petProfile = null;
+                }
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
             }
         });
     }
