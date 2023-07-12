@@ -23,14 +23,14 @@ import com.google.firebase.auth.FirebaseAuth;
 public class MainActivity extends AppCompatActivity {
 
     private static BottomNavigationView main_BNV_menu;
-    private static int mainFragmentLocation = R.id.main_FRAME_fragments;
-    private static int topFragmentLocation = R.id.main_FRAME_top;
+    private static final int mainFragmentLocation = R.id.main_FRAME_fragments;
+    private static final int topFragmentLocation = R.id.main_FRAME_top;
 
-    private static int menu_home = R.id.menu_FRG_home;
-    private static int menu_meals = R.id.menu_FRG_meals;
-    private static int menu_add = R.id.menu_FRG_add;
-    private static int menu_walks = R.id.menu_FRG_walks;
-    private static int menu_settings = R.id.menu_FRG_settings;
+    private static final int menu_home = R.id.menu_FRG_home;
+    private static final int menu_meals = R.id.menu_FRG_meals;
+    private static final int menu_add = R.id.menu_FRG_add;
+    private static final int menu_walks = R.id.menu_FRG_walks;
+    private static final int menu_settings = R.id.menu_FRG_settings;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

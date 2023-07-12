@@ -1,4 +1,4 @@
-package com.example.pawsome.Callbacks;
+package com.example.pawsome.callbacks;
 
 import com.example.pawsome.model.Meal;
 

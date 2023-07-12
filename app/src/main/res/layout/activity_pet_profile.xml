@@ -25,7 +25,7 @@
             android:layout_below="@+id/pet_LBL_title">
             <androidx.appcompat.widget.LinearLayoutCompat
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_below="@+id/create_LBL_title"
                 android:orientation="vertical"
                 android:paddingStart="60dp"
@@ -49,7 +49,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
                     android:layout_marginTop="5dp"
-                    android:text="@string/upload_button"
+                    android:text="@string/button_upload"
                     style="@style/Widget.Material3.Button.OutlinedButton"
                     android:textSize="15sp"
                     app:strokeColor="@color/colorPrimaryDark"
@@ -60,7 +60,7 @@
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Name"
+                    android:hint="@string/hint_pet_name"
                     android:layout_marginTop="10dp">
                     <com.google.android.material.textfield.TextInputEditText
                         android:layout_width="match_parent"
@@ -71,8 +71,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="5dp"
-                    android:text="Gender"
-                    android:textSize="12dp"/>
+                    android:text="@string/hint_gender"
+                    android:textSize="12sp"/>
 
                 <androidx.appcompat.widget.AppCompatSpinner
                     android:id="@+id/pet_SP_gender"
@@ -92,7 +92,7 @@
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Date of Birth"
+                    android:hint="@string/hint_date_of_birth"
                     android:enabled="false"
                     android:layout_weight="1">
                     <com.google.android.material.textfield.TextInputEditText
@@ -117,7 +117,7 @@
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Food Type">
+                    android:hint="@string/hint_food_type">
                     <com.google.android.material.textfield.TextInputEditText
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"/>
@@ -133,7 +133,7 @@
                         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="Amount"
+                        android:hint="@string/hint_amount"
                         android:inputType="numberDecimal"
                         android:layout_weight="1">
                         <com.google.android.material.textfield.TextInputEditText
@@ -148,7 +148,7 @@
                         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="Units"
+                        android:hint="@string/hint_units"
                         android:layout_weight="1">
                         <com.google.android.material.textfield.TextInputEditText
                             android:layout_width="match_parent"
@@ -174,8 +174,8 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="5dp"
-                            android:text="Regular Meals"
-                            android:textSize="12dp"/>
+                            android:text="@string/text_regular_meals"
+                            android:textSize="12sp"/>
 
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/pet_BTN_add_meal"
@@ -183,9 +183,9 @@
                             android:layout_height="35dp"
                             android:layout_gravity="center_horizontal"
                             android:layout_marginTop="5dp"
-                            android:text="+"
+                            android:text="@string/text_as_icon_plus"
                             style="@style/Widget.Material3.Button.OutlinedButton"
-                            android:textSize="10sp"
+                            android:textSize="11sp"
                             app:strokeColor="@color/colorPrimaryDark"
                             android:textAllCaps="false"/>
 
@@ -202,8 +202,8 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="5dp"
-                            android:text="Regular Walks"
-                            android:textSize="12dp" />
+                            android:text="@string/text_regular_walks"
+                            android:textSize="12sp" />
 
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/pet_BTN_add_walk"
@@ -211,9 +211,9 @@
                             android:layout_height="35dp"
                             android:layout_gravity="center_horizontal"
                             android:layout_marginTop="5dp"
-                            android:text="+"
+                            android:text="@string/text_as_icon_plus"
                             style="@style/Widget.Material3.Button.OutlinedButton"
-                            android:textSize="10sp"
+                            android:textSize="11sp"
                             app:strokeColor="@color/colorPrimaryDark"
                             android:textAllCaps="false" />
 
@@ -228,7 +228,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="bottom|center_horizontal"
                     android:layout_marginTop="20dp"
-                    android:text="@string/save_button"
+                    android:text="@string/button_save"
                     android:textAllCaps="false" />
 
             </androidx.appcompat.widget.LinearLayoutCompat>

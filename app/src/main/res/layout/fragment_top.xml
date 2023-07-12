@@ -24,7 +24,7 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="20dp"
         android:textSize="30sp"
-        android:text="@string/user_title_prefix"
+        android:text="@string/title_user_greeting_prefix"
         android:gravity="center"
         android:textStyle="bold"
         android:textColor="@color/white"/>

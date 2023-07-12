@@ -10,8 +10,8 @@ public class FirebaseDB {
 
     private static FirebaseDB instance;
 
-    private FirebaseStorage storageDB;
-    private FirebaseDatabase realtimeDB;
+    private final FirebaseStorage storageDB;
+    private final FirebaseDatabase realtimeDB;
 
     private FirebaseDB() {
         storageDB = FirebaseStorage.getInstance();

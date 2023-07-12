@@ -17,7 +17,7 @@ public class CurrentUser {
     private static CurrentUser currentUser = null;
     private UserProfile userProfile = null;
 
-    private FirebaseUser user;
+    private final FirebaseUser user;
 
     private CurrentUser() {
         user = FirebaseAuth.getInstance().getCurrentUser();

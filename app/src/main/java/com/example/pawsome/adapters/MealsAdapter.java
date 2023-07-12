@@ -11,7 +11,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.example.pawsome.Callbacks.MealCallback;
+import com.example.pawsome.callbacks.MealCallback;
 import com.example.pawsome.R;
 import com.example.pawsome.model.Meal;
 import com.google.android.material.button.MaterialButton;
@@ -23,7 +23,7 @@ import java.util.HashMap;
 
 public class MealsAdapter extends RecyclerView.Adapter<MealsAdapter.MealViewHolder> {
 
-    private Fragment fragment;
+    private final Fragment fragment;
     private HashMap<String, Meal> allMealsList;
 
 

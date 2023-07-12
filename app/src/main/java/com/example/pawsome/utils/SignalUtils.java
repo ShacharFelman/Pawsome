@@ -9,7 +9,7 @@ import android.widget.Toast;
 public class SignalUtils {
     private static SignalUtils signalUtilsGenerator = null;
 
-    private Context context;
+    private final Context context;
     private static Vibrator v;
 
 

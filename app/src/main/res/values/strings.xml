@@ -3,84 +3,41 @@
 
     <string name="title_user_profile">User Profile</string>
     <string name="title_pet_profile">Pet Profile</string>
+    <string name="title_meals_log">Meals Log</string>
+    <string name="title_user_greeting_prefix">Hello</string>
 
-    <string name="name_hint">Enter a Name</string>
-    <string name="phone_hint">Enter a Phone Number</string>
-    <string name="date_hint">dd/mm/yyyy</string>
-    <string name="food_type_hint">Food Type</string>
-    <string name="food_unit_hint">Units</string>
-    <string name="food_amount_hint">Amount</string>
+    <string name="button_upload">Upload Image</string>
+    <string name="button_save">Save</string>
+    <string name="button_add_pet">Add New Pet</string>
+    <string name="button_home">Go to HomePage</string>
 
+    <string name="menu_home">Home</string>
+    <string name="menu_meals_log">Meals Log</string>
+    <string name="menu_add">Add</string>
+    <string name="menu_walks_log">Walks Log</string>
+    <string name="menu_settings">Settings</string>
 
-    <string name="upload_button">Upload Image</string>
-    <string name="save_button">Save</string>
-    <string name="add_pet_button">Add New Pet</string>
-    <string name="home_button">Go to HomePage</string>
+    <string name="hint_pet_name">Name</string>
+    <string name="hint_user_name">Name</string>
+    <string name="hint_gender">Gender</string>
+    <string name="hint_date_of_birth">Date of Birth</string>
+    <string name="hint_food_type">Food Type</string>
+    <string name="hint_amount">Amount</string>
+    <string name="hint_units">Units</string>
+    <string name="hint_phone_number">Phone</string>
 
+    <string name="text_regular_meals">Regular Meals</string>
+    <string name="text_as_icon_plus">+</string>
+    <string name="text_regular_walks">Regular Walks</string>
 
-    <string name="title_home">Home</string>
-    <string name="title_my_groups">Your Groups</string>
-    <string name="title_create_a_group">Create A Group</string>
-    <string name="title_activity_login">LoginActivity</string>
-    <string name="title_favorite_games">Favorite Games</string>
-    <string name="prompt_email">Email</string>
-    <string name="prompt_password">Password</string>
-    <string name="action_sign_in">Sign in or register</string>
-    <string name="action_sign_in_short">Sign in</string>
-    <string name="welcome">"Welcome !"</string>
-    <string name="invalid_username">Not a valid username</string>
-    <string name="invalid_password">Password must be >5 characters</string>
-    <string name="login_failed">"Login failed"</string>
-    <string name="description">Description</string>
-    <string name="create">Create</string>
-    <string name="create_a_group">Create A Group</string>
-    <string name="capacity">Capacity</string>
-    <string name="password">Password</string>
-    <string name="join">Join</string>
-    <string name="leave">Leave</string>
-    <string name="type_a_message">Type a message</string>
-    <string name="favorite_games">Favorite Games</string>
-    <string name="search_a_game">Search a game</string>
-    <string name="search_a_group">Search a group</string>
-    <string name="your_groups">Your Groups</string>
-    <string name="gaming_plat">Gaming Platform</string>
-    <string name="game">Game</string>
-    <string name="select_a_game">Select A Game</string>
-    <string name="platfrom">Platfrom</string>
-    <string name="region">Region</string>
-    <string name="europe">Europe</string>
+    <string name="prompt_exists_pet_note">If your pet already has a profile in the app, please ask the owner to add it to your account. You can always add a new pet later.</string>
+
+    <string name="img_desc_meal_icon">Meal icon</string>
 
     <string-array name="Gender">
         <item>Male</item>
         <item>Female</item>
         <item>Undefined</item>
     </string-array>
-
-    <string-array name="Region">
-        <item>Any</item>
-        <item>Europe</item>
-        <item>Asia</item>
-        <item>North America</item>
-        <item>South America</item>
-        <item>Africa</item>
-        <item>Oceania</item>
-    </string-array>
-
-    <string-array name="Skill">
-        <item>Any</item>
-        <item>Beginner</item>
-        <item>Experienced</item>
-        <item>Professional</item>
-    </string-array>
-    <string-array name="Platform">
-        <item>Any</item>
-        <item>PC</item>
-        <item>Playstation</item>
-        <item>Xbox</item>
-        <item>Nintendo Switch</item>
-    </string-array>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="user_title_prefix">Hello</string>
 
 </resources>

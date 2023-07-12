@@ -8,8 +8,8 @@ import com.google.firebase.database.DatabaseReference;
 public class DBCrud {
 
     private static DBCrud instance;
-    private DatabaseReference usersDatabaseReference;
-    private DatabaseReference petsDatabaseReference;
+    private final DatabaseReference usersDatabaseReference;
+    private final DatabaseReference petsDatabaseReference;
 
     private DBCrud() {
         usersDatabaseReference = FirebaseDB.getInstance().getDatabaseReference(Constants.DB_USERS);

@@ -99,7 +99,7 @@
                         android:layout_gravity="center_vertical"
                         android:src="@drawable/ic_menu_meal"
                         app:tint="@color/colorRecycleItemSecondaryText"
-                        android:contentDescription="Meal icon"/>
+                        android:contentDescription="@string/img_desc_meal_icon"/>
 
                     <com.google.android.material.textview.MaterialTextView
                         android:id="@+id/meal_TV_meal_type"

@@ -1,28 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
-
     <item
         android:id="@+id/menu_FRG_home"
         android:icon="@drawable/ic_home"
-        android:title="Home" />
+        android:title="@string/menu_home" />
 
     <item
         android:id="@+id/menu_FRG_meals"
         android:icon="@drawable/ic_menu_meal"
-        android:title="Food Log" />
+        android:title="@string/menu_meals_log" />
 
     <item
         android:id="@+id/menu_FRG_add"
         android:icon="@drawable/ic_menu_plus"
-        android:title="Add" />
+        android:title="@string/menu_add" />
     <item
         android:id="@+id/menu_FRG_walks"
         android:icon="@drawable/ic_menu_poop"
-        android:title="Walks Log" />
+        android:title="@string/menu_walks_log" />
     <item
         android:id="@+id/menu_FRG_settings"
         android:icon="@drawable/ic_menu_settings"
-        android:title="Settings" />
+        android:title="@string/menu_settings" />
 
 </menu>

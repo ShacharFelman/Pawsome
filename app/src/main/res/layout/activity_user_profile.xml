@@ -48,7 +48,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="5dp"
-                android:text="@string/upload_button"
+                android:text="@string/button_upload"
                 style="@style/Widget.Material3.Button.OutlinedButton"
                 android:textSize="15sp"
                 app:strokeColor="@color/colorPrimaryDark"
@@ -59,7 +59,7 @@
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Name"
+                android:hint="@string/hint_user_name"
                 android:layout_marginTop="10dp">
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -73,7 +73,7 @@
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Phone"
+                android:hint="@string/hint_phone_number"
                 android:layout_marginTop="10dp">
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -86,7 +86,7 @@
                 android:id="@+id/profile_BTN_save"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/save_button"
+                android:text="@string/button_save"
                 android:layout_gravity="bottom|center_horizontal"
                 android:layout_marginTop="20dp"
                 android:textAllCaps="false"
@@ -106,7 +106,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
                     android:layout_marginTop="15dp"
-                    android:text="@string/add_pet_button"
+                    android:text="@string/button_add_pet"
                     style="@style/Widget.Material3.Button.OutlinedButton"
                     android:textSize="15sp"
                     app:strokeColor="@color/colorPrimaryDark"
@@ -115,7 +115,7 @@
                 <com.google.android.material.textview.MaterialTextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="If your pet already has a profile in the app, please ask the owner to add it to your account. You can always add a new pet later."
+                    android:text="@string/prompt_exists_pet_note"
                     android:layout_gravity="center"
                     android:gravity="center"
                     android:layout_marginTop="10dp"/>
@@ -124,7 +124,7 @@
                     android:id="@+id/profile_BTN_home"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/home_button"
+                    android:text="@string/button_home"
                     android:layout_gravity="bottom|center_horizontal"
                     android:layout_marginTop="20dp"
                     android:textAllCaps="false"
