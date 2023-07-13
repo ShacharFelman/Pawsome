@@ -44,17 +44,14 @@
                     app:civ_border_color="#80595959"
                     app:civ_border_width="1dp" />
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/pet_BTN_upload"
+                <com.google.android.material.progressindicator.CircularProgressIndicator
+                    android:id="@+id/pet_CPI_upload"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    android:layout_marginTop="5dp"
-                    android:text="@string/button_upload"
-                    style="@style/Widget.Material3.Button.OutlinedButton"
-                    android:textSize="15sp"
-                    app:strokeColor="@color/colorPrimaryDark"
-                    android:textAllCaps="false" />
+                    android:indeterminate="true"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="10dp"
+                    android:visibility="invisible"/>
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/pet_EDT_name"
@@ -145,7 +142,7 @@
                             android:textAllCaps="false"/>
 
                         <androidx.recyclerview.widget.RecyclerView
-                            android:id="@+id/meals_log_LST_meals"
+                            android:id="@+id/pet_LST_meals"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             tools:listitem="@layout/item_meal_type"

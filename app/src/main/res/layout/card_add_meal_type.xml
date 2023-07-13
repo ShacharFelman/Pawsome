@@ -9,7 +9,8 @@
     android:visibility="visible"
     app:cardCornerRadius="16dp"
     app:cardElevation="8dp"
-    android:layout_centerInParent="true">
+    android:layout_centerInParent="true"
+    android:background="@drawable/background_bubble">
     <!--    tools:showIn="@layout/activity_pet_profile">-->
 
     <androidx.appcompat.widget.LinearLayoutCompat

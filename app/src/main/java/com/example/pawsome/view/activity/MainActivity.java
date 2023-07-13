@@ -96,11 +96,13 @@ public class MainActivity extends AppCompatActivity {
                 .commit();
     }
 
+    public void replaceToHomeFragment() {
+        main_BNV_menu.setSelectedItemId(R.id.menu_FRG_home);
+    }
+
     private void setAddDialog() {
-        // instance of alert dialog to build alert dialog
         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
 
-        // set the neutral button to do some actions
         builder.setNeutralButton("Meal", (dialog, which) -> replaceFragment(AddMealFragment.class, mainFragmentLocation));
         builder.setNegativeButton("Walk", (dialog, which) -> replaceFragment(AddWalkFragment.class, mainFragmentLocation));
 
@@ -115,27 +117,4 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
         finish();
     }
-
-//    public void addHardCodedMealsData() {
-//        Log.d("pet_null", "addHardCodedMealsData: CurrentPet = " + CurrentPet.getInstance().getPetProfile());
-//        if(CurrentPet.getInstance().getPetProfile() == null)
-//            return;
-//
-//        for (int i = 0; i < 10; i++) {
-//            Meal meal = new Meal();
-//            meal
-//                    .setOwner(CurrentUser.getInstance().getUserProfile())
-//                    .setPetId(CurrentPet.getInstance().getPetId())
-//                    .setDateTime(System.currentTimeMillis() - (i * 1000 * 60))
-//                    .setAmount(100 + i)
-//                    .setUnit("grams")
-//                    .setFoodType("Proplan Salmon")
-//                    .setMealType(i % 3 == 0 ? "breakfast" : i % 3 == 1 ? "launch" : "dinner")
-//                    .setNote("hello " + i);
-//
-//            CurrentPet.getInstance().getPetProfile().addMeal(meal);
-//        }
-//
-//        DBCrud.getInstance().setPetInDB(CurrentPet.getInstance().getPetProfile());
-//    }
 }

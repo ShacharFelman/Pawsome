@@ -37,6 +37,8 @@
     <string name="title_add_meal_type">Add Meal Type</string>
     <string name="hint_meal_name">Meal name</string>
     <string name="hint_time">Meal Time</string>
+    <string name="title_add_meal">Add Meal</string>
+    <string name="hint_date">Date</string>
 
     <string-array name="Gender">
         <item>Male</item>

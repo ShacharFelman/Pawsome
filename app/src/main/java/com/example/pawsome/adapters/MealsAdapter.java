@@ -15,6 +15,7 @@ import com.example.pawsome.callbacks.MealCallback;
 import com.example.pawsome.R;
 import com.example.pawsome.current_state.CurrentUser;
 import com.example.pawsome.model.Meal;
+import com.example.pawsome.utils.Constants;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.textview.MaterialTextView;
@@ -56,8 +57,8 @@ public class MealsAdapter extends RecyclerView.Adapter<MealsAdapter.MealViewHold
     public void onBindViewHolder(@NonNull MealViewHolder holder, int position) {
         Meal meal = getItem(position);
         holder.meal_TV_user.setText(meal.getOwner().getName());
-        holder.meal_TV_time.setText(meal.getDateTimeAsLocalDateTime().format(DateTimeFormatter.ofPattern("HH:mm")));
-        holder.meal_TV_date.setText(meal.getDateTimeAsLocalDateTime().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+        holder.meal_TV_time.setText(meal.getDateTimeAsLocalDateTime().format(DateTimeFormatter.ofPattern(Constants.FORMAT_TIME)));
+        holder.meal_TV_date.setText(meal.getDateTimeAsLocalDateTime().format(DateTimeFormatter.ofPattern(Constants.FORMAT_DATE)));
         holder.meal_TV_note.setText(meal.getNote());
         holder.meal_TV_type.setText(meal.getMealType().getName());
         Glide.

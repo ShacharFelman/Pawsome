@@ -11,10 +11,12 @@ import java.util.UUID;
 public class Meal {
 
     private UserProfile owner;
-    private String petId;
+//    private String petId;
     private long dateTime;
     private String note;
     private MealType mealType;
+
+    private String name;
 
     private int amount;
     private String unit;
@@ -50,14 +52,14 @@ public class Meal {
         return this;
     }
 
-    public String getPetId() {
-        return petId;
-    }
+//    public String getPetId() {
+//        return petId;
+//    }
 
-    public Meal setPetId(String petId) {
-        this.petId = petId;
-        return this;
-    }
+//    public Meal setPetId(String petId) {
+//        this.petId = petId;
+//        return this;
+//    }
 
     public MealType getMealType() {
         return mealType;
@@ -105,18 +107,13 @@ public class Meal {
         return this;
     }
 
-    @Override
-    public String toString() {
-        return "Meal{" +
-                "owner=" + owner +
-                ", petId='" + petId + '\'' +
-                ", dateTime=" + dateTime +
-                ", note='" + note + '\'' +
-                ", mealType=" + mealType +
-                ", amount=" + amount +
-                ", unit='" + unit + '\'' +
-                ", foodType='" + foodType + '\'' +
-                '}';
+    public String getName() {
+        return name;
+    }
+
+    public Meal setName(String name) {
+        this.name = name;
+        return this;
     }
 
     public Meal setMealDefaultDataFromMealType() {
@@ -134,5 +131,20 @@ public class Meal {
         this.unit = mealType.getUnit();
         this.foodType = mealType.getFoodType();
         return this;
+    }
+
+    @Override
+    public String toString() {
+        return "Meal{" +
+                "owner=" + owner +
+//                ", petId='" + petId + '\'' +
+                ", dateTime=" + dateTime +
+                ", note='" + note + '\'' +
+                ", mealType=" + mealType +
+                ", name='" + name + '\'' +
+                ", amount=" + amount +
+                ", unit='" + unit + '\'' +
+                ", foodType='" + foodType + '\'' +
+                '}';
     }
 }

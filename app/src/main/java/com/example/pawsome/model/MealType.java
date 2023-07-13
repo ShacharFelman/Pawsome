@@ -1,7 +1,10 @@
 package com.example.pawsome.model;
 
+import com.example.pawsome.utils.Constants;
+
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Objects;
 
 public class MealType {
 
@@ -68,16 +71,32 @@ public class MealType {
     }
 
     public String getTimeAsString() {
-        LocalTime time = LocalTime.ofSecondOfDay(this.time);
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
-        return time.format(formatter);
+        LocalTime time = LocalTime.ofSecondOfDay((int)this.time);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(Constants.FORMAT_TIME);
+        return formatter.format(time);
     }
 
     public MealType setTimeFromString(String timeString) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(Constants.FORMAT_TIME);
         this.time = LocalTime.parse(timeString, formatter).toSecondOfDay();
         return this;
     }
 
+    @Override
+    public String toString() {
+        return this.name;
+    }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        MealType mealType = (MealType) o;
+        return Objects.equals(name, mealType.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name);
+    }
 }

@@ -162,4 +162,18 @@ public class PetProfile {
     public void addMeal(Meal meal) {
         this.meals.add(meal);
     }
+
+    public boolean addMealType(MealType mealType) {
+        if(this.mealTypes.contains(mealType))
+            return false;
+
+        return this.mealTypes.add(mealType);
+    }
+
+    public boolean removeMealType(MealType mealType) {
+        if(!this.mealTypes.contains(mealType))
+            return false;
+
+        return this.mealTypes.remove(mealType);
+    }
 }

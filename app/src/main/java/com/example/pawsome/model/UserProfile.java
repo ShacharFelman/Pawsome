@@ -94,14 +94,6 @@ public class UserProfile {
 
     @Override
     public String toString() {
-        return "UserProfile{" +
-                "name='" + name + '\'' +
-                ", uid='" + uid + '\'' +
-                ", profileImage='" + profileImage + '\'' +
-                ", email='" + email + '\'' +
-                ", phoneNumber='" + phoneNumber + '\'' +
-                ", petsIds=" + petsIds +
-                ", isRegistered=" + registered +
-                '}';
+        return this.name;
     }
 }

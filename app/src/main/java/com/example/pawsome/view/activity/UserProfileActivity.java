@@ -23,6 +23,8 @@ import com.bumptech.glide.Glide;
 import com.example.pawsome.R;
 import com.example.pawsome.dal.FirebaseDB;
 import com.example.pawsome.current_state.CurrentUser;
+import com.example.pawsome.databinding.ActivityPetProfileBinding;
+import com.example.pawsome.databinding.ActivityUserProfileBinding;
 import com.example.pawsome.model.UserProfile;
 import com.example.pawsome.utils.Constants;
 import com.google.android.material.button.MaterialButton;
@@ -33,17 +35,18 @@ import com.google.firebase.storage.StorageReference;
 public class UserProfileActivity extends AppCompatActivity {
 
     private StorageReference storageReference;
-    private MaterialButton profile_BTN_upload;
-    private MaterialButton profile_BTN_add_pet;
-    private MaterialButton profile_BTN_save;
-    private MaterialButton profile_BTN_home;
-    private ImageView profile_IMG_profile;
-    private TextInputLayout profile_EDT_name;
-    private TextInputLayout profile_EDT_phone;
-    private LinearLayoutCompat profile_LAY_next_page_options;
+    private ActivityUserProfileBinding binding;
+//    private MaterialButton profile_BTN_upload;
+//    private MaterialButton profile_BTN_add_pet;
+//    private MaterialButton profile_BTN_save;
+//    private MaterialButton profile_BTN_home;
+//    private ImageView profile_IMG_profile;
+//    private TextInputLayout profile_EDT_name;
+//    private TextInputLayout profile_EDT_phone;
+//    private LinearLayoutCompat profile_LAY_next_page_options;
     private static final int IMAGE_UPLOAD_REQUEST_CODE = 1;
     private Uri imageUri;
-    String imageUrl;
+    private String imageUrl;
     private String fileName;
     private ActivityResultLauncher<Intent> imagePickerLauncher;
     private boolean isImageUploaded = true;
@@ -52,11 +55,11 @@ public class UserProfileActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_user_profile);
+        binding = ActivityUserProfileBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
         storageReference = FirebaseDB.getInstance().getStorageReference(Constants.DB_USERS_PROFILE_IMAGES);
 
-        initViews();
         setButtonsListener();
         setTextChangedListener();
         initImagePickerLauncher();
@@ -71,45 +74,33 @@ public class UserProfileActivity extends AppCompatActivity {
             goToLoginActivity();
     }
 
-    private void initViews() {
-        profile_IMG_profile = findViewById(R.id.profile_IMG_profile);
-        profile_BTN_upload = findViewById(R.id.profile_BTN_upload);
-        profile_BTN_add_pet = findViewById(R.id.profile_BTN_add_pet);
-        profile_BTN_home = findViewById(R.id.profile_BTN_home);
-        profile_BTN_save = findViewById(R.id.profile_BTN_save);
-        profile_EDT_name = findViewById(R.id.profile_EDT_name);
-        profile_EDT_phone = findViewById(R.id.profile_EDT_phone);
-        profile_LAY_next_page_options = findViewById(R.id.profile_LAY_next_page_options);
-    }
-
     private void setButtonsListener () {
-        profile_IMG_profile.setOnClickListener(v -> checkPermissionAndUploadImage());
-        profile_BTN_upload.setOnClickListener(v -> uploadImage());
-        profile_BTN_add_pet.setOnClickListener(v -> goToPetProfileActivity());
-        profile_BTN_save.setOnClickListener(v -> updateUserProfile(imageUrl));
-        profile_BTN_home.setOnClickListener(v -> goToMainActivity());
+        binding.profileIMGProfile.setOnClickListener(v -> checkPermissionAndUploadImage());
+        binding.profileBTNAddPet.setOnClickListener(v -> goToPetProfileActivity());
+        binding.profileBTNSave.setOnClickListener(v -> updateUserProfile(imageUrl));
+        binding.profileBTNHome.setOnClickListener(v -> goToMainActivity());
     }
 
     private void setTextChangedListener() {
-        profile_EDT_name.getEditText().addTextChangedListener(new TextWatcher() {
+        binding.profileEDTName.getEditText().addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
             @Override
             public void onTextChanged(CharSequence name, int start, int before, int count) {
-                if(!profile_EDT_name.getEditText().getText().toString().isEmpty())
-                    profile_EDT_name.setError(null);
+                if(!binding.profileEDTName.getEditText().getText().toString().isEmpty())
+                    binding.profileEDTName.setError(null);
             }
             @Override
             public void afterTextChanged(Editable s) { }
         });
 
-        profile_EDT_phone.getEditText().addTextChangedListener(new TextWatcher() {
+        binding.profileEDTPhone.getEditText().addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
             @Override
             public void onTextChanged(CharSequence amount, int start, int before, int count) {
-                if(!profile_EDT_phone.getEditText().getText().toString().isEmpty())
-                    profile_EDT_phone.setError(null);
+                if(!binding.profileEDTPhone.getEditText().getText().toString().isEmpty())
+                    binding.profileEDTPhone.setError(null);
             }
             @Override
             public void afterTextChanged(Editable s) { }
@@ -118,12 +109,12 @@ public class UserProfileActivity extends AppCompatActivity {
 
 
     private boolean validateFields() {
-        if(profile_EDT_name.getEditText().getText().toString().isEmpty()) {
-            profile_EDT_name.setError("Name is required!");
+        if(binding.profileEDTName.getEditText().getText().toString().isEmpty()) {
+            binding.profileEDTName.setError("Name is required!");
             return false;
         }
-        if (profile_EDT_phone.getEditText().getText().toString().isEmpty()) {
-            profile_EDT_phone.setError("Phone is required!");
+        if (binding.profileEDTPhone.getEditText().getText().toString().isEmpty()) {
+            binding.profileEDTPhone.setError("Phone is required!");
             return false;
         }
         if(!isImageUploaded) {
@@ -139,9 +130,9 @@ public class UserProfileActivity extends AppCompatActivity {
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
                     if (result.getResultCode() == RESULT_OK && result.getData() != null && result.getData().getData() != null) {
-                        setImageNotUploaded();
                         imageUri = result.getData().getData();
-                        profile_IMG_profile.setImageURI(imageUri);
+                        binding.profileIMGProfile.setImageURI(imageUri);
+                        uploadImage();
                     }
                 }
         );
@@ -151,14 +142,14 @@ public class UserProfileActivity extends AppCompatActivity {
         UserProfile userProfile = CurrentUser.getInstance().getUserProfile();
 
         if(userProfile.getName() != null && !userProfile.getName().isEmpty())
-            profile_EDT_name.getEditText().setText(userProfile.getName());
+            binding.profileEDTName.getEditText().setText(userProfile.getName());
         if(userProfile.getPhoneNumber() != null && !userProfile.getPhoneNumber().isEmpty())
-            profile_EDT_phone.getEditText().setText(userProfile.getPhoneNumber());
+            binding.profileEDTPhone.getEditText().setText(userProfile.getPhoneNumber());
         if(userProfile.getProfileImage() != null && !userProfile.getProfileImage().isEmpty()) {
             imageUrl = userProfile.getProfileImage();
             Glide.with(UserProfileActivity.this)
                     .load(userProfile.getProfileImage())
-                    .into(profile_IMG_profile);
+                    .into(binding.profileIMGProfile);
         }
     }
 
@@ -167,8 +158,8 @@ public class UserProfileActivity extends AppCompatActivity {
             return;
 
             UserProfile userProfile = CurrentUser.getInstance().getUserProfile();
-            String phone = profile_EDT_phone.getEditText().getText().toString();
-            String name = profile_EDT_name.getEditText().getText().toString();
+            String phone =  binding.profileEDTPhone.getEditText().getText().toString();
+            String name = binding.profileEDTName.getEditText().getText().toString();
             userProfile
                     .setPhoneNumber(phone)
                     .setName(name)
@@ -180,7 +171,8 @@ public class UserProfileActivity extends AppCompatActivity {
     }
 
     private void uploadImage() {
-        // TODO: start show progress bar (loading)
+        setImageUploadingView(true);
+
         this.fileName = CurrentUser.getInstance().getUid();
         StorageReference reference = storageReference.child(this.fileName);
         reference.putFile(imageUri)
@@ -189,11 +181,11 @@ public class UserProfileActivity extends AppCompatActivity {
                         imageUrl = task.getResult().toString();
                         setImageUploaded();
                     });
-                    profile_IMG_profile.setImageURI(null);
-                    // TODO: stop show progress bar
+                    binding.profileIMGProfile.setImageURI(null);
+                    setImageUploadingView(false);
                     Toast.makeText(UserProfileActivity.this, "Image Uploaded", Toast.LENGTH_SHORT).show();
                 }).addOnFailureListener(e -> {
-                    // TODO: stop show progress bar
+                    setImageUploadingView(false);
                     Toast.makeText(UserProfileActivity.this, "Failed Uploaded Image", Toast.LENGTH_SHORT).show();
                 });
     }
@@ -229,24 +221,6 @@ public class UserProfileActivity extends AppCompatActivity {
         }
     }
 
-//    private void openImagePicker() {
-//        Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-//        intent.setType("image/*");
-//        intent.setAction(Intent.ACTION_GET_CONTENT);
-//        startActivityForResult(intent, IMAGE_UPLOAD_REQUEST_CODE);
-//    }
-//
-//    @Override
-//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-//        super.onActivityResult(requestCode, resultCode, data);
-//        if (requestCode == IMAGE_UPLOAD_REQUEST_CODE && resultCode == RESULT_OK && data!= null && data.getData() != null) {
-//            // Get the URI of the selected image
-//            setImageNotUploaded();
-//            imageUri = data.getData();
-//            profile_IMG_profile.setImageURI(imageUri);
-//        }
-//    }
-
     private void openImagePicker() {
         Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         intent.setType("image/*");
@@ -256,15 +230,11 @@ public class UserProfileActivity extends AppCompatActivity {
 
     private void setImageUploaded() {
         isImageUploaded = true;
-        profile_BTN_upload.setEnabled(false);
-        profile_BTN_upload.setText("Image Ready");
-        profile_IMG_profile.setImageURI(imageUri);
+        binding.profileIMGProfile.setImageURI(imageUri);
     }
 
     private void setImageNotUploaded() {
         isImageUploaded = false;
-        profile_BTN_upload.setEnabled(true);
-        profile_BTN_upload.setText("Upload Image");
     }
 
     private void goToLoginActivity() {
@@ -286,9 +256,21 @@ public class UserProfileActivity extends AppCompatActivity {
     }
 
     private void profileSaved() {
-        profile_BTN_save.setEnabled(false);
-        profile_BTN_save.setText("Profile Saved");
-        profile_LAY_next_page_options.setVisibility(View.VISIBLE);
+        binding.profileBTNSave.setEnabled(false);
+        binding.profileBTNSave.setText("Profile Saved");
+        binding.profileLAYNextPageOptions.setVisibility(View.VISIBLE);
+    }
+
+    private void setImageUploadingView(boolean isUploading) {
+        if (isUploading) {
+            binding.profileCPIUpload.setVisibility(View.VISIBLE);
+            binding.profileIMGProfile.setEnabled(false);
+            binding.profileBTNSave.setEnabled(false);
+        } else {
+            binding.profileCPIUpload.setVisibility(View.INVISIBLE);
+            binding.profileIMGProfile.setEnabled(true);
+            binding.profileBTNSave.setEnabled(true);
+        }
     }
 
 }
