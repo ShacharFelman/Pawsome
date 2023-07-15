@@ -11,7 +11,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 
 import com.example.pawsome.current_state.CurrentPet;
-import com.example.pawsome.dal.DBCrud;
+import com.example.pawsome.dal.DataCrud;
 import com.example.pawsome.databinding.FragmentAddMealBinding;
 import com.example.pawsome.model.Meal;
 import com.example.pawsome.model.MealType;
@@ -170,7 +170,7 @@ public class AddMealFragment extends Fragment {
                 this.owners = new ArrayList<>();
 
             for (String userId : CurrentPet.getInstance().getPetProfile().getOwnersIds()) {
-                DBCrud.getInstance().getUserReference(userId).addListenerForSingleValueEvent(new ValueEventListener() {
+                DataCrud.getInstance().getUserReference(userId).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         if (snapshot.exists()) {
@@ -209,7 +209,7 @@ public class AddMealFragment extends Fragment {
 
 
             CurrentPet.getInstance().getPetProfile().addMeal(meal);
-            DBCrud.getInstance().setPetInDB(CurrentPet.getInstance().getPetProfile());
+            DataCrud.getInstance().setPetInDB(CurrentPet.getInstance().getPetProfile());
 
             ((MainActivity) getActivity()).replaceToHomeFragment();
         }

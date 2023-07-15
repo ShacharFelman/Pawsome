@@ -1,66 +1,157 @@
 package com.example.pawsome.view.fragment;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
+import android.provider.ContactsContract;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.pawsome.R;
+import com.bumptech.glide.Glide;
+import com.example.pawsome.adapters.PetsAdapter;
+import com.example.pawsome.callbacks.PetCallback;
+import com.example.pawsome.current_state.CurrentPet;
+import com.example.pawsome.current_state.CurrentUser;
+import com.example.pawsome.dal.DataCrud;
+import com.example.pawsome.databinding.FragmentSettingsBinding;
+import com.example.pawsome.model.PetProfile;
+import com.example.pawsome.view.activity.MainActivity;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.ValueEventListener;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link SettingsFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+import java.util.ArrayList;
+import java.util.List;
+
+
 public class SettingsFragment extends Fragment {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    private FragmentSettingsBinding binding;
+    private PetsAdapter petsAdapter;
+    private List<PetProfile> pets = new ArrayList<>();
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             ViewGroup container, Bundle savedInstanceState) {
+        binding = FragmentSettingsBinding.inflate(inflater, container, false);
+        View root = binding.getRoot();
 
-    public SettingsFragment() {
-        // Required empty public constructor
+        initButtonsListeners();
+        setUserImageView();
+        setUserNameView();
+        getPetsData();
+
+        return root;
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment ProfileFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static SettingsFragment newInstance(String param1, String param2) {
-        SettingsFragment fragment = new SettingsFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
+    private void initButtonsListeners() {
+        binding.settingsBTNProfile.setOnClickListener(v -> goToProfileActivity());
+        binding.settingsBTNAddPet.setOnClickListener(v -> goToPetProfileActivity());
     }
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+    private void setUserImageView() {
+        Glide
+                .with(this)
+                .load(CurrentUser.getInstance().getUserProfile().getProfileImage())
+                .into(binding.profileIMGProfile);
+    }
+
+    private void setUserNameView() {
+        binding.settingsLBLName.setText(CurrentUser.getInstance().getUserProfile().getName());
+    }
+
+    private void setPetsListCallbacks() {
+        petsAdapter.setPetCallback(new PetCallback() {
+            @Override
+            public void deleteClicked(PetProfile pet, int position) {
+                deletePetPressed(pet);
+            }
+
+            @Override
+            public void itemClicked(PetProfile pet, int position) {
+                goToPetProfileActivity(pet.getId());
+            }
+        });
+    }
+
+    private void getPetsData() {
+        if (CurrentUser.getInstance().getUserProfile().hasPets()) {
+            binding.settingsCPIPetsLoading.setVisibility(View.VISIBLE);
+            for (String petId : CurrentUser.getInstance().getUserProfile().getPetsIds()) {
+                DataCrud.getInstance().getPetReference(petId).addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if (snapshot.exists()) {
+                            pets.add(snapshot.getValue(PetProfile.class));
+                            if (pets.size() == CurrentUser.getInstance().getUserProfile().getPetsIds().size()) {
+                                setPetsListView();
+                                binding.settingsCPIPetsLoading.setVisibility(View.INVISIBLE);
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                    }
+                });
+            }
         }
     }
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_settings, container, false);
+
+
+    private void deletePetPressed(PetProfile pet) {
+        MaterialAlertDialogBuilder alertDialogBuilder = new MaterialAlertDialogBuilder(requireContext());
+        alertDialogBuilder.setTitle("Delete Pet");
+        alertDialogBuilder.setMessage("Delete " + pet.getName() + " from your pets list?");
+        alertDialogBuilder.setIcon(android.R.drawable.ic_menu_delete);
+        alertDialogBuilder.setPositiveButton("Delete", (dialog, which) -> deletePetFromUser(pet));
+        alertDialogBuilder.setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss());
+        alertDialogBuilder.show();
     }
+
+
+    private void setPetsListView() {
+        petsAdapter = new PetsAdapter(this, pets);
+        binding.settingsLSTPets.setLayoutManager(new LinearLayoutManager(getContext()));
+        binding.settingsLSTPets.setAdapter(petsAdapter);
+        setPetsListCallbacks();
+    }
+
+    private void deletePetFromUser(PetProfile pet) {
+        if (pet.isOnlyOneOwner())
+            DataCrud.getInstance().deletePetFromDB(pet.getId());
+
+        CurrentUser.getInstance().getUserProfile().deletePet(pet.getId());
+        CurrentUser.getInstance().saveCurrentUserToDB();
+    }
+
+    private void goToProfileActivity() {
+        ((MainActivity) getActivity()).goToProfileActivity();
+    }
+
+    private void goToPetProfileActivity() {
+        ((MainActivity) getActivity()).goToPetProfileActivity();
+    }
+
+    private void goToPetProfileActivity(String petId) {
+        ((MainActivity) getActivity()).goToPetProfileActivity(petId);
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+    }
+
 }

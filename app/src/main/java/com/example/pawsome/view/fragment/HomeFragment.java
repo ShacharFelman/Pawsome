@@ -52,7 +52,6 @@ public class HomeFragment extends Fragment {
 //            binding.homeLSTOffers.setVisibility(View.GONE);
 //            binding.homeTVNoGroups.setVisibility(View.VISIBLE);
 //        } else {
-//            Log.d("firebase", "else: " + meals.toString());
 //            binding.homeLSTOffers.setVisibility(View.VISIBLE);
 //            binding.homeTVNoGroups.setVisibility(View.GONE);
 //        }

@@ -9,47 +9,36 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.LinearLayoutCompat;
 import androidx.core.app.ActivityCompat;
 
 import com.bumptech.glide.Glide;
-import com.example.pawsome.R;
+import com.example.pawsome.dal.FilesCrud;
 import com.example.pawsome.dal.FirebaseDB;
 import com.example.pawsome.current_state.CurrentUser;
-import com.example.pawsome.databinding.ActivityPetProfileBinding;
 import com.example.pawsome.databinding.ActivityUserProfileBinding;
 import com.example.pawsome.model.UserProfile;
 import com.example.pawsome.utils.Constants;
-import com.google.android.material.button.MaterialButton;
-import com.google.android.material.textfield.TextInputLayout;
+
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.storage.StorageReference;
 
 public class UserProfileActivity extends AppCompatActivity {
 
-    private StorageReference storageReference;
     private ActivityUserProfileBinding binding;
-//    private MaterialButton profile_BTN_upload;
-//    private MaterialButton profile_BTN_add_pet;
-//    private MaterialButton profile_BTN_save;
-//    private MaterialButton profile_BTN_home;
-//    private ImageView profile_IMG_profile;
-//    private TextInputLayout profile_EDT_name;
-//    private TextInputLayout profile_EDT_phone;
-//    private LinearLayoutCompat profile_LAY_next_page_options;
+
     private static final int IMAGE_UPLOAD_REQUEST_CODE = 1;
     private Uri imageUri;
     private String imageUrl;
     private String fileName;
     private ActivityResultLauncher<Intent> imagePickerLauncher;
     private boolean isImageUploaded = true;
+    private boolean isNewUesr = false;
+    private boolean isFromActivityMain = false;
 
 
     @Override
@@ -58,13 +47,13 @@ public class UserProfileActivity extends AppCompatActivity {
         binding = ActivityUserProfileBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        storageReference = FirebaseDB.getInstance().getStorageReference(Constants.DB_USERS_PROFILE_IMAGES);
+        isNewUesr = getIntent().getBooleanExtra(Constants.KEY_NEW_PET, true);
+        isFromActivityMain = getIntent().getBooleanExtra(Constants.KEY_FROM_MAIN, true);
 
         setButtonsListener();
         setTextChangedListener();
         initImagePickerLauncher();
         initUserProfileData();
-        setImageUploaded();
     }
 
     @Override
@@ -172,14 +161,14 @@ public class UserProfileActivity extends AppCompatActivity {
 
     private void uploadImage() {
         setImageUploadingView(true);
+        isImageUploaded = false;
 
         this.fileName = CurrentUser.getInstance().getUid();
-        StorageReference reference = storageReference.child(this.fileName);
-        reference.putFile(imageUri)
+        FilesCrud.getInstance().getUserFileReference(this.fileName).putFile(imageUri)
                 .addOnSuccessListener(taskSnapshot -> {
                     taskSnapshot.getStorage().getDownloadUrl().addOnCompleteListener(task -> {
                         imageUrl = task.getResult().toString();
-                        setImageUploaded();
+                        isImageUploaded = true;
                     });
                     binding.profileIMGProfile.setImageURI(null);
                     setImageUploadingView(false);
@@ -228,15 +217,6 @@ public class UserProfileActivity extends AppCompatActivity {
         imagePickerLauncher.launch(intent);
     }
 
-    private void setImageUploaded() {
-        isImageUploaded = true;
-        binding.profileIMGProfile.setImageURI(imageUri);
-    }
-
-    private void setImageNotUploaded() {
-        isImageUploaded = false;
-    }
-
     private void goToLoginActivity() {
         Intent intent = new Intent(this, LoginActivity.class);
         startActivity(intent);
@@ -250,7 +230,12 @@ public class UserProfileActivity extends AppCompatActivity {
     }
 
     private void goToPetProfileActivity() {
+        Bundle bundle = new Bundle();
+        bundle.putBoolean(Constants.KEY_NEW_PET, true);
+        bundle.putBoolean(Constants.KEY_FROM_MAIN, false);
+
         Intent intent = new Intent(this, PetProfileActivity.class);
+        intent.putExtras(bundle);
         startActivity(intent);
         finish();
     }
@@ -258,6 +243,11 @@ public class UserProfileActivity extends AppCompatActivity {
     private void profileSaved() {
         binding.profileBTNSave.setEnabled(false);
         binding.profileBTNSave.setText("Profile Saved");
+        if(!CurrentUser.getInstance().getUserProfile().hasPets())
+            binding.profileLAYNewPet.setVisibility(View.VISIBLE);
+        else
+            binding.profileLAYNewPet.setVisibility(View.GONE);
+
         binding.profileLAYNextPageOptions.setVisibility(View.VISIBLE);
     }
 

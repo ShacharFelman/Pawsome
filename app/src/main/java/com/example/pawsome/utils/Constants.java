@@ -10,5 +10,7 @@ public class Constants {
     public final static String DEFAULT_PET_IMAGE_URL = "https://static.thenounproject.com/png/13421-200.png";
     public final static String FORMAT_TIME = "HH:mm";
     public final static String FORMAT_DATE = "dd/MM/yyyy";
-
+    public final static String KEY_PET_ID = "petId";
+    public final static String KEY_NEW_PET = "NewPet";
+    public static final String KEY_FROM_MAIN = "FromActivityMain";
 }

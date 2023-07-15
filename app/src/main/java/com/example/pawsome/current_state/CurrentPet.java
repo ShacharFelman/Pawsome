@@ -4,13 +4,10 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import com.example.pawsome.dal.DBCrud;
-import com.example.pawsome.dal.FirebaseDB;
+import com.example.pawsome.dal.DataCrud;
 import com.example.pawsome.model.PetProfile;
-import com.example.pawsome.utils.Constants;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
@@ -43,12 +40,12 @@ public class CurrentPet {
     }
 
     public CurrentPet setPetProfileById(String petId) {
-        loadPetProfile(petId);
+//        loadPetProfile(petId);
         return this;
     }
 
     private void loadPetProfile(String petId) {
-        DBCrud.getInstance().getPetReference(petId).addListenerForSingleValueEvent(new ValueEventListener() {
+        DataCrud.getInstance().getPetReference(petId).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
@@ -56,7 +53,6 @@ public class CurrentPet {
                     notifyObservers();
                 }
                 else {
-                    Log.d("pet_null", "loadPetProfile: PetId = " + petId + " does not exist");
                     petProfile = null;
                 }
             }

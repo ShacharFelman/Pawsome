@@ -18,39 +18,55 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.bumptech.glide.Glide;
+import com.example.pawsome.R;
 import com.example.pawsome.adapters.MealTypeAdapter;
-import com.example.pawsome.dal.DBCrud;
-import com.example.pawsome.dal.FirebaseDB;
-import com.example.pawsome.current_state.CurrentPet;
+import com.example.pawsome.adapters.OwnersAdapter;
+import com.example.pawsome.dal.DataCrud;
 import com.example.pawsome.current_state.CurrentUser;
+import com.example.pawsome.dal.FilesCrud;
+import com.example.pawsome.dal.FirebaseDB;
 import com.example.pawsome.databinding.ActivityPetProfileBinding;
 import com.example.pawsome.model.MealType;
 import com.example.pawsome.model.PetProfile;
+import com.example.pawsome.model.UserProfile;
 import com.example.pawsome.utils.Constants;
+import com.example.pawsome.utils.DateTimeConverter;
+import com.example.pawsome.utils.SignalUtils;
 import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.timepicker.MaterialTimePicker;
 import com.google.android.material.timepicker.TimeFormat;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.storage.StorageReference;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class PetProfileActivity extends AppCompatActivity {
 
     private ActivityPetProfileBinding binding;
-    private StorageReference storageReference;
     private MealTypeAdapter mealTypeAdapter;
+    private OwnersAdapter ownersAdapter;
     private static final int IMAGE_UPLOAD_REQUEST_CODE = 1;
     private Uri imageUri;
     String imageUrl;
     private String fileName;
     private ActivityResultLauncher<Intent> imagePickerLauncher;
-
     private boolean isImageUploaded = true;
     private PetProfile petProfile;
+    private String petId;
+    private boolean isNewPet = false;
+    private boolean isFromActivityMain = false;
+
+    private List<UserProfile> owners = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,19 +74,23 @@ public class PetProfileActivity extends AppCompatActivity {
         binding = ActivityPetProfileBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        storageReference = FirebaseDB.getInstance().getStorageReference(Constants.DB_PETS_PROFILE_IMAGES);
+        isNewPet = getIntent().getBooleanExtra(Constants.KEY_NEW_PET, true);
+        isFromActivityMain = getIntent().getBooleanExtra(Constants.KEY_FROM_MAIN, true);
+        Log.d("aaa", "onCreate: isNewPet: " + isNewPet);
+        if(!isNewPet) {
+            petId = getIntent().getStringExtra(Constants.KEY_PET_ID);
+            Log.d("aaa", "onCreate: petId: " + petId);
+            if (petId == null || petId.isEmpty())
+                errorGetPetData();
 
-        initPetProfile();
+            loadPetData();
+        }
+        else
+            initPetProfile();
 
-        initPetView();
-        initAddMealTypeView();
+        initView();
 
-        initImagePickerLauncher();
-        initRecyclerView();
-
-        setCallbacks();
-
-        setImageUploaded();
+        isImageUploaded = true;
     }
 
     @Override
@@ -78,6 +98,14 @@ public class PetProfileActivity extends AppCompatActivity {
         super.onStart();
         if (FirebaseAuth.getInstance().getCurrentUser() == null || CurrentUser.getInstance().getUserProfile() == null)
             goToLoginActivity();
+    }
+
+    private void initView() {
+        initPetView();
+        initAddMealTypeView();
+        initImagePickerLauncher();
+        if(isNewPet)
+            initMealTypesListView();
     }
 
     private void initPetView() {
@@ -91,15 +119,18 @@ public class PetProfileActivity extends AppCompatActivity {
         cancelMealType();
     }
 
-    private void setCallbacks() {
+    private void initMealTypesListCallbacks() {
         mealTypeAdapter.setGroupCallback((mealType, position) -> petProfile.removeMealType(mealType));
     }
 
     private void setPetButtonsListener() {
         binding.petIMGProfile.setOnClickListener(v -> checkPermissionAndUploadImage());
-        binding.petBTNSave.setOnClickListener(v -> updatePetProfile(imageUrl));
+        binding.petBTNSave.setOnClickListener(v -> updatePetProfile());
         binding.petBTNDateOfBirth.setOnClickListener(v -> setDate());
         binding.petBTNAddMeal.setOnClickListener(v -> addMealType());
+        binding.petBTNOwnersList.setOnClickListener(v -> ownersListPressed());
+        binding.petBTNAddOwner.setOnClickListener(v -> addOwnerPressed());
+        binding.petBTNSearchOwner.setOnClickListener(v -> getOwnerByEmail());
     }
 
     private void setAddMealTypeButtonsListener() {
@@ -206,7 +237,6 @@ public class PetProfileActivity extends AppCompatActivity {
             public void afterTextChanged(Editable s) {
             }
         });
-
         binding.petEDTDateOfBirth.getEditText().addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -222,12 +252,35 @@ public class PetProfileActivity extends AppCompatActivity {
             public void afterTextChanged(Editable s) {
             }
         });
+        binding.petEDTOwnerEmail.getEditText().addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence amount, int start, int before, int count) {
+                if (!binding.petEDTOwnerEmail.getEditText().getText().toString().isEmpty())
+                    binding.petEDTOwnerEmail.setError(null);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+        });
     }
 
-    private void initRecyclerView() {
+    private void initMealTypesListView() {
         mealTypeAdapter = new MealTypeAdapter(this, petProfile.getMealTypes());
         binding.petLSTMeals.setLayoutManager(new LinearLayoutManager(this));
         binding.petLSTMeals.setAdapter(mealTypeAdapter);
+        initMealTypesListCallbacks();
+    }
+
+    private void initOwnersListView() {
+        hideOwnersList();
+        ownersAdapter = new OwnersAdapter(this, owners);
+        binding.petLSTOwners.setLayoutManager(new LinearLayoutManager(this));
+        binding.petLSTOwners.setAdapter(ownersAdapter);
     }
 
     private void initImagePickerLauncher() {
@@ -280,7 +333,6 @@ public class PetProfileActivity extends AppCompatActivity {
         mealType.setTimeFromString(binding.petCVAddMealType.petMealEDTTime.getEditText().getText().toString());
 
         if (petProfile.addMealType(mealType)) {
-            Log.d("save", "saveMealType: Meal type added successfully! " + petProfile.getMealTypes());
             mealTypeAdapter.notifyDataSetChanged();
             cancelMealType();
         } else {
@@ -366,38 +418,254 @@ public class PetProfileActivity extends AppCompatActivity {
         });
     }
 
-    private void updatePetProfile(String imageUrl) {
+    private void updatePetProfile() {
         if (!validatePetFields())
             return;
 
         String name = binding.petEDTName.getEditText().getText().toString();
         String gender = binding.petSPGender.getSelectedItem().toString();
         String dateOfBirth = binding.petEDTDateOfBirth.getEditText().getText().toString();
+        LocalDate localDate = LocalDate.parse(dateOfBirth, DateTimeFormatter.ofPattern(Constants.FORMAT_DATE));
 
         petProfile
                 .setName(name)
                 .setGender(gender)
-                .setDateOfBirth(dateOfBirth)
+                .setDateOfBirth(DateTimeConverter.localDateToLong(localDate))
                 .setProfileImage(imageUrl);
 
-        CurrentUser.getInstance().getUserProfile().getPetsIds().add(petProfile.getId());
-        CurrentPet.getInstance().setPetProfile(petProfile);
-        DBCrud.getInstance().setPetInDB(petProfile);
-        DBCrud.getInstance().setUserInDB(CurrentUser.getInstance().getUserProfile());
-//        goToMainActivity();
+        addOwnerToPet(CurrentUser.getInstance().getUserProfile());
+        DataCrud.getInstance().setPetInDB(petProfile);
+
+        if(isFromActivityMain)
+            finish();
+        else
+            goToMainActivity();
+    }
+
+    private void goToLoginActivity() {
+        Intent intent = new Intent(this, LoginActivity.class);
+        startActivity(intent);
         finish();
+    }
+
+    private void loadPetData() {
+        setPetLoadingView(true);
+        DataCrud.getInstance().getPetReference(petId).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    petProfile = (snapshot.getValue(PetProfile.class));
+                    loadOwnersData();
+                    setPetDataInView();
+                    initMealTypesListView();
+                    setPetLoadingView(false);
+                } else
+                    errorGetPetData();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                errorGetPetData();
+            }
+        });
+    }
+
+    private void loadOwnersData() {
+        if (petProfile.getOwnersIds() != null && !petProfile.getOwnersIds().isEmpty()) {
+            for (String ownerId : petProfile.getOwnersIds()) {
+                DataCrud.getInstance().getUserReference(ownerId).addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if (snapshot.exists()) {
+                            UserProfile owner = snapshot.getValue(UserProfile.class);
+                            owners.add(owner);
+                            if (owners.size() == petProfile.getOwnersIds().size()) {
+                                initOwnersListView();
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                    }
+                });
+            }
+        }
+    }
+
+    private void setPetDataInView() {
+        binding.petEDTName.getEditText().setText(petProfile.getName());
+        binding.petSPGender.setSelection(getGender(petProfile.getGender()));
+        binding.petEDTDateOfBirth.getEditText().setText(DateTimeConverter.longToString(petProfile.getDateOfBirth()));
+
+        Glide
+                .with(this).
+                load(petProfile.getProfileImage()).
+                into(binding.petIMGProfile);
+
+        initMealTypesListView();
+    }
+
+    private int getGender(String gender) {
+        switch (gender) {
+            case "Male":
+                return 0;
+            case "Female":
+                return 1;
+            case "Undefined":
+                return 2;
+        }
+        return 0;
+    }
+
+    private void disablePetProfileFields() {
+        binding.petIMGProfile.setEnabled(false);
+        binding.petEDTName.setEnabled(false);
+        binding.petSPGender.setEnabled(false);
+        binding.petBTNAddMeal.setEnabled(false);
+        binding.petBTNDateOfBirth.setEnabled(false);
+        binding.petBTNAddWalk.setEnabled(false);
+        binding.petBTNSave.setEnabled(false);
+        binding.petLSTMeals.setEnabled(false);
+        binding.petLSTMeals.setEnabled(false);
+        binding.petBTNOwnersList.setEnabled(false);
+        binding.petBTNAddOwner.setEnabled(false);
+    }
+
+    private void enablePetProfileFields() {
+        binding.petIMGProfile.setEnabled(true);
+        binding.petEDTName.setEnabled(true);
+        binding.petSPGender.setEnabled(true);
+        binding.petBTNAddMeal.setEnabled(true);
+        binding.petBTNDateOfBirth.setEnabled(true);
+        binding.petBTNAddWalk.setEnabled(true);
+        binding.petBTNSave.setEnabled(true);
+        binding.petLSTMeals.setEnabled(true);
+        binding.petBTNOwnersList.setEnabled(true);
+        binding.petBTNAddOwner.setEnabled(true);
+    }
+
+    private void ownersListPressed() {
+        if (binding.petLSTOwners.getVisibility() == View.VISIBLE)
+            hideOwnersList();
+        else
+            showOwnersList();
+    }
+
+    private void addOwnerPressed() {
+        if (binding.petLAYAddOwner.getVisibility() == View.VISIBLE)
+            hideAddOwner();
+        else
+            showAddOwner();
+    }
+
+    private void hideOwnersList() {
+        binding.petLSTOwners.setVisibility(View.GONE);
+        binding.petBTNOwnersList.setBackgroundColor(getResources().getColor(R.color.colorPrimary, getTheme()));
+    }
+
+    private void showOwnersList() {
+        binding.petLSTOwners.setVisibility(View.VISIBLE);
+        binding.petBTNOwnersList.setBackgroundColor(getResources().getColor(R.color.colorPrimaryLight, getTheme()));
+    }
+
+    private void hideAddOwner() {
+        binding.petLAYAddOwner.setVisibility(View.GONE);
+        binding.petBTNAddOwner.setBackgroundColor(getResources().getColor(R.color.colorPrimary, getTheme()));
+    }
+
+    private void showAddOwner() {
+        binding.petLAYAddOwner.setVisibility(View.VISIBLE);
+        binding.petBTNAddOwner.setBackgroundColor(getResources().getColor(R.color.colorPrimaryLight, getTheme()));
+    }
+
+    private void getOwnerByEmail() {
+        String emailToSearch = binding.petEDTOwnerEmail.getEditText().getText().toString();
+        if (emailToSearch.isEmpty()) {
+            binding.petEDTOwnerEmail.setError("Email not valid");
+            return;
+        }
+
+        binding.petBTNSearchOwner.setEnabled(false);
+        binding.petCPISeaching.setVisibility(View.VISIBLE);
+
+        Query query = FirebaseDB.getInstance().getUsersReference().orderByChild("email").equalTo(emailToSearch);
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            boolean isFound = false;
+
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot userSnapshot : dataSnapshot.getChildren()) {
+                    isFound = true;
+                    UserProfile user = userSnapshot.getValue(UserProfile.class);
+                    binding.petBTNSearchOwner.setEnabled(true);
+                    binding.petCPISeaching.setVisibility(View.INVISIBLE);
+                    addOwnerToPet(user);
+                }
+                if (!isFound)
+                    errorGetOwnerByEmail();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                errorGetOwnerByEmail();
+            }
+        });
+
+    }
+
+    private void addOwnerToPet(UserProfile user) {
+        if (user == null)
+            return;
+
+        boolean isOwnerAdded = false;
+
+        if (!user.getPetsIds().contains(petProfile.getId())) {
+            user.getPetsIds().add(petProfile.getId());
+            isOwnerAdded = true;
+        }
+
+        DataCrud.getInstance().setUserInDB(user);
+
+        if(isOwnerAdded)
+            SignalUtils.getInstance().toast("Owner added successfully");
+    }
+
+    private void setImageUploadingView(boolean isUploading) {
+        if (isUploading) {
+            binding.petCPIUpload.setVisibility(View.VISIBLE);
+            binding.petIMGProfile.setAlpha(0.5f);
+            binding.petIMGProfile.setEnabled(false);
+            binding.petBTNSave.setEnabled(false);
+        } else {
+            binding.petCPIUpload.setVisibility(View.INVISIBLE);
+            binding.petIMGProfile.setAlpha(1f);
+            binding.petIMGProfile.setEnabled(true);
+            binding.petBTNSave.setEnabled(true);
+        }
+    }
+
+    private void setPetLoadingView(boolean isLoading) {
+        if (isLoading) {
+            binding.petLAYProfile.setVisibility(View.INVISIBLE);
+            binding.petCPIPetsLoading.setVisibility(View.VISIBLE);
+        } else {
+            binding.petLAYProfile.setVisibility(View.VISIBLE);
+            binding.petCPIPetsLoading.setVisibility(View.INVISIBLE);
+        }
     }
 
     private void uploadImage() {
         setImageUploadingView(true);
+        isImageUploaded = false;
 
         this.fileName = petProfile.getId();
-        StorageReference reference = storageReference.child(this.fileName);
-        reference.putFile(imageUri)
+
+        FilesCrud.getInstance().getPetFileReference(this.fileName).putFile(imageUri)
                 .addOnSuccessListener(taskSnapshot -> {
                     taskSnapshot.getStorage().getDownloadUrl().addOnCompleteListener(task -> {
                         imageUrl = task.getResult().toString();
-                        setImageUploaded();
+                        isImageUploaded = true;
                     });
                     binding.petIMGProfile.setImageURI(null);
                     setImageUploadingView(false);
@@ -406,6 +674,18 @@ public class PetProfileActivity extends AppCompatActivity {
                     setImageUploadingView(false);
                     Toast.makeText(PetProfileActivity.this, "Failed Uploaded Image", Toast.LENGTH_SHORT).show();
                 });
+    }
+
+    private void errorGetPetData() {
+        SignalUtils.getInstance().toast("Error loading pet data");
+        finish();
+    }
+
+    private void errorGetOwnerByEmail() {
+        binding.petBTNSearchOwner.setEnabled(true);
+        binding.petEDTOwnerEmail.setError("Email not found");
+        binding.petBTNSearchOwner.setVisibility(View.VISIBLE);
+        binding.petCPISeaching.setVisibility(View.INVISIBLE);
     }
 
     private void checkPermissionAndUploadImage() {
@@ -436,59 +716,9 @@ public class PetProfileActivity extends AppCompatActivity {
         imagePickerLauncher.launch(intent);
     }
 
-    private void setImageUploaded() {
-        isImageUploaded = true;
-        binding.petIMGProfile.setImageURI(imageUri);
-    }
-
-    private void setImageNotUploaded() {
-        isImageUploaded = false;
-    }
-
-    private void goToLoginActivity() {
-        Intent intent = new Intent(this, LoginActivity.class);
-        startActivity(intent);
-        finish();
-    }
-
     private void goToMainActivity() {
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
         finish();
-    }
-
-    private void disablePetProfileFields() {
-        binding.petIMGProfile.setEnabled(false);
-        binding.petEDTName.setEnabled(false);
-        binding.petSPGender.setEnabled(false);
-        binding.petBTNAddMeal.setEnabled(false);
-        binding.petBTNDateOfBirth.setEnabled(false);
-        binding.petBTNAddWalk.setEnabled(false);
-        binding.petBTNSave.setEnabled(false);
-        binding.petLSTMeals.setEnabled(false);
-        binding.petLSTMeals.setEnabled(false);
-    }
-
-    private void enablePetProfileFields() {
-        binding.petIMGProfile.setEnabled(true);
-        binding.petEDTName.setEnabled(true);
-        binding.petSPGender.setEnabled(true);
-        binding.petBTNAddMeal.setEnabled(true);
-        binding.petBTNDateOfBirth.setEnabled(true);
-        binding.petBTNAddWalk.setEnabled(true);
-        binding.petBTNSave.setEnabled(true);
-        binding.petLSTMeals.setEnabled(true);
-    }
-
-    private void setImageUploadingView(boolean isUploading) {
-        if (isUploading) {
-            binding.petCPIUpload.setVisibility(View.VISIBLE);
-            binding.petIMGProfile.setEnabled(false);
-            binding.petBTNSave.setEnabled(false);
-        } else {
-            binding.petCPIUpload.setVisibility(View.INVISIBLE);
-            binding.petIMGProfile.setEnabled(true);
-            binding.petBTNSave.setEnabled(true);
-        }
     }
 }

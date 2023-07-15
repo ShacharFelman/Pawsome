@@ -4,15 +4,12 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import com.example.pawsome.dal.DBCrud;
-import com.example.pawsome.dal.FirebaseDB;
+import com.example.pawsome.dal.DataCrud;
 import com.example.pawsome.model.UserProfile;
-import com.example.pawsome.utils.Constants;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 
 public class CurrentUser {
@@ -25,7 +22,7 @@ public class CurrentUser {
     private CurrentUser() {
         user = FirebaseAuth.getInstance().getCurrentUser();
         if (user != null) {
-            loadUserProfile();
+//            loadUserProfile();
         }
     }
 
@@ -45,7 +42,7 @@ public class CurrentUser {
     }
 
     private void loadUserProfile() {
-        DBCrud.getInstance().getUserReference(user.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+        DataCrud.getInstance().getUserReference(user.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
@@ -69,11 +66,14 @@ public class CurrentUser {
     }
 
     public void setCurrentPet() {
-        Log.d("pet_null", "setCurrentPet: " + userProfile.getPetsIds());
         if(userProfile.getPetsIds() == null || userProfile.getPetsIds().isEmpty())
             return;
 
         CurrentPet.getInstance().setPetProfileById(userProfile.getPetsIds().get(0));
+    }
+
+    public void saveCurrentUserToDB() {
+        DataCrud.getInstance().setUserInDB(this.userProfile);
     }
 
     @Override

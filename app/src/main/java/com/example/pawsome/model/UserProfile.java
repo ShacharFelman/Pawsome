@@ -12,11 +12,10 @@ public class UserProfile {
     private String profileImage;
     private String email;
     private String phoneNumber;
-    private List<String> petsIds;
+    private List<String> petsIds = new ArrayList<>();
     private boolean registered;
 
     public UserProfile() {
-        this.petsIds = new ArrayList<>();
         this.profileImage = Constants.DEFAULT_USER_IMAGE_URL;
     }
 
@@ -24,7 +23,6 @@ public class UserProfile {
         this.name = name;
         this.uid = uid;
         this.email = email;
-        this.petsIds = new ArrayList<>();
         this.registered = false;
         this.profileImage = Constants.DEFAULT_USER_IMAGE_URL;
     }
@@ -90,6 +88,15 @@ public class UserProfile {
     public UserProfile setRegistered(boolean registered) {
         this.registered = registered;
         return this;
+    }
+
+    public UserProfile deletePet(String petId) {
+        this.petsIds.remove(petId);
+        return this;
+    }
+
+    public boolean hasPets() {
+        return !petsIds.isEmpty();
     }
 
     @Override

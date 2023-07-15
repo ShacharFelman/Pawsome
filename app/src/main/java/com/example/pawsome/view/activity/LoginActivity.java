@@ -10,7 +10,7 @@ import android.util.Log;
 
 import com.example.pawsome.R;
 import com.example.pawsome.current_state.CurrentPet;
-import com.example.pawsome.dal.DBCrud;
+import com.example.pawsome.dal.DataCrud;
 import com.example.pawsome.dal.FirebaseDB;
 import com.example.pawsome.current_state.CurrentUser;
 import com.example.pawsome.model.PetProfile;
@@ -18,6 +18,8 @@ import com.example.pawsome.model.UserProfile;
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract;
 import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -25,7 +27,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -90,49 +91,71 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void loadUserProfile() {
-        DBCrud.getInstance().getUserReference(firebaseUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+        DataCrud.getInstance().getUserReference(firebaseUser.getUid()).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.exists())
-                    CurrentUser.getInstance().setUserProfile(snapshot.getValue(UserProfile.class));
-                else
-                    createUser();
+            public void onComplete(@NonNull Task<DataSnapshot> task) {
+                if (!task.isSuccessful()) {
+                    Log.e("firebase", "Error getting data", task.getException());
+                } else {
+                    if (task.getResult().getValue() != null)
+                        CurrentUser.getInstance().setUserProfile(task.getResult().getValue(UserProfile.class));
+                    else
+                        createUser();
+                    if (!CurrentUser.getInstance().getUserProfile().getRegistered())
+                        goToProfileActivity();
+//                else if(CurrentUser.getInstance().getUserProfile().getPetsIds() != null && CurrentUser.getInstance().getUserProfile().getPetsIds().isEmpty()) {
+//                    loadPetProfile(CurrentUser.getInstance().getUserProfile().getPetsIds().get(0));
+////                    goToMainActivity();
+//                }
+                    else
+                        goToMainActivity();
+                }
+            }
+        });
 
-                if(!CurrentUser.getInstance().getUserProfile().getRegistered())
-                    goToProfileActivity();
-                else if(CurrentUser.getInstance().getUserProfile().getPetsIds() != null && CurrentUser.getInstance().getUserProfile().getPetsIds().isEmpty()) {
-                    loadPetProfile(CurrentUser.getInstance().getUserProfile().getPetsIds().get(0));
+
+//        DataCrud.getInstance().getUserReference(firebaseUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                if (snapshot.exists())
+//                    CurrentUser.getInstance().setUserProfile(snapshot.getValue(UserProfile.class));
+//                else
+//                    createUser();
+//
+//                if (!CurrentUser.getInstance().getUserProfile().getRegistered())
+//                    goToProfileActivity();
+////                else if(CurrentUser.getInstance().getUserProfile().getPetsIds() != null && CurrentUser.getInstance().getUserProfile().getPetsIds().isEmpty()) {
+////                    loadPetProfile(CurrentUser.getInstance().getUserProfile().getPetsIds().get(0));
+//////                    goToMainActivity();
+////                }
+//                else
 //                    goToMainActivity();
-                }
-                else
-                    goToMainActivity();
-            }
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError error) {
+//
+//            }
+//        });
     }
 
-    private void loadPetProfile(String petId) {
-        DBCrud.getInstance().getPetReference(petId).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.exists()) {
-                    CurrentPet.getInstance().setPetProfile(snapshot.getValue(PetProfile.class));
-                    goToMainActivity();
-                    Log.d("pet_null", "loadPetProfile (login): CurrentPet = " + CurrentPet.getInstance().getPetProfile());
-                }
-                else {
-                    Log.d("pet_null", "loadPetProfile (login): PetId = " + petId + " does not exist");
-//                    petProfile = null;
-                }
-            }
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-            }
-        });
-    }
+//    private void loadPetProfile(String petId) {
+//        DataCrud.getInstance().getPetReference(petId).addListenerForSingleValueEvent(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                if (snapshot.exists()) {
+//                    CurrentPet.getInstance().setPetProfile(snapshot.getValue(PetProfile.class));
+//                    goToMainActivity();
+//                }
+//                else {
+////                    petProfile = null;
+//                }
+//            }
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError error) {
+//            }
+//        });
+//    }
 
     private void createUser() {
         UserProfile userProfile = new UserProfile(firebaseUser.getDisplayName(), firebaseUser.getUid(), firebaseUser.getEmail());

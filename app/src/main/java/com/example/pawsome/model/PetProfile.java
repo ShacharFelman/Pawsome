@@ -2,8 +2,11 @@ package com.example.pawsome.model;
 
 import com.example.pawsome.utils.Constants;
 
+import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -16,52 +19,17 @@ public class PetProfile {
     private String name;
     private String profileImage;
     private String gender;
-    private List<String> ownersIds;
-    private String dateOfBirth;
-    // TODO: change to walkType
-    private List<LocalTime> WalksTimes;
-    private List<MealType> mealTypes;
-    // TODO: change to walks
-    private Map<LocalDateTime, String> walksIds;
-    private List<Meal> meals;
+    private long dateOfBirth;
+    private List<String> ownersIds = new ArrayList<>();
+    private List<MealType> mealTypes = new ArrayList<>();
+    private List<Meal> meals = new ArrayList<>();
 
+    // TODO: change to walks like meals
+    // TODO: change to walkType
 
     public PetProfile() {
         this.id = UUID.randomUUID().toString();
-        this.ownersIds = new ArrayList<>();
-        this.WalksTimes = new ArrayList<>();
-        this.mealTypes = new ArrayList<>();
-        this.walksIds = new HashMap<>();
-        this.meals = new ArrayList<>();
-        this.profileImage = Constants.DEFAULT_USER_IMAGE_URL;
-    }
-
-    public PetProfile(String name, String gender, String ownerId, String dateOfBirth, List<LocalTime> walksTimes, List<MealType> mealTypes) {
-        this.id = UUID.randomUUID().toString();
-        this.name = name;
         this.profileImage = Constants.DEFAULT_PET_IMAGE_URL;
-        this.gender = gender;
-        this.dateOfBirth = dateOfBirth;
-        this.WalksTimes = walksTimes == null ? new ArrayList<>() : walksTimes;
-        this.mealTypes = mealTypes == null ? new ArrayList<>() : mealTypes;
-        this.ownersIds = new ArrayList<>();
-        this.ownersIds.add(ownerId);
-        this.walksIds = new HashMap<>();
-        this.meals = new ArrayList<>();
-    }
-
-    public PetProfile(String name, String gender, String ownerId, String dateOfBirth) {
-        this.id = UUID.randomUUID().toString();
-        this.name = name;
-        this.profileImage = Constants.DEFAULT_PET_IMAGE_URL;
-        this.gender = gender;
-        this.dateOfBirth = dateOfBirth;
-        this.WalksTimes = new ArrayList<>();
-        this.mealTypes = new ArrayList<>();
-        this.ownersIds = new ArrayList<>();
-        this.ownersIds.add(ownerId);
-        this.walksIds = new HashMap<>();
-        this.meals = new ArrayList<>();
     }
 
     public String getId() {
@@ -109,21 +77,12 @@ public class PetProfile {
         return this;
     }
 
-    public String getDateOfBirth() {
+    public long getDateOfBirth() {
         return dateOfBirth;
     }
 
-    public PetProfile setDateOfBirth(String dateOfBirth) {
+    public PetProfile setDateOfBirth(long dateOfBirth) {
         this.dateOfBirth = dateOfBirth;
-        return this;
-    }
-
-    public List<LocalTime> getWalksTimes() {
-        return WalksTimes;
-    }
-
-    public PetProfile setWalksTimes(List<LocalTime> walksTimes) {
-        WalksTimes = walksTimes;
         return this;
     }
 
@@ -133,15 +92,6 @@ public class PetProfile {
 
     public PetProfile setMealTypes(List<MealType> mealTypes) {
         this.mealTypes = mealTypes;
-        return this;
-    }
-
-    public Map<LocalDateTime, String> getWalksIds() {
-        return walksIds;
-    }
-
-    public PetProfile setWalksIds(Map<LocalDateTime, String> walksIds) {
-        this.walksIds = walksIds;
         return this;
     }
 
@@ -170,10 +120,15 @@ public class PetProfile {
         return this.mealTypes.add(mealType);
     }
 
+    public boolean isOnlyOneOwner() {
+        return this.ownersIds.size() == 1;
+    }
+
     public boolean removeMealType(MealType mealType) {
         if(!this.mealTypes.contains(mealType))
             return false;
 
         return this.mealTypes.remove(mealType);
     }
+
 }

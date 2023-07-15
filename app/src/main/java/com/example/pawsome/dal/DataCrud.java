@@ -5,20 +5,20 @@ import com.example.pawsome.model.UserProfile;
 import com.example.pawsome.utils.Constants;
 import com.google.firebase.database.DatabaseReference;
 
-public class DBCrud {
+public class DataCrud {
 
-    private static DBCrud instance;
+    private static DataCrud instance;
     private final DatabaseReference usersDatabaseReference;
     private final DatabaseReference petsDatabaseReference;
 
-    private DBCrud() {
+    private DataCrud() {
         usersDatabaseReference = FirebaseDB.getInstance().getDatabaseReference(Constants.DB_USERS);
         petsDatabaseReference = FirebaseDB.getInstance().getDatabaseReference(Constants.DB_PETS);
     }
 
-    public static DBCrud getInstance() {
+    public static DataCrud getInstance() {
         if (instance == null) {
-            instance = new DBCrud();
+            instance = new DataCrud();
         }
         return instance;
     }
@@ -39,5 +39,8 @@ public class DBCrud {
         return petsDatabaseReference.child(id);
     }
 
+    public void deletePetFromDB(String petId) {
+        petsDatabaseReference.child(petId).removeValue();
+    }
 
 }
