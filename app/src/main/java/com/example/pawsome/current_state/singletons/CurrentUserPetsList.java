@@ -14,6 +14,8 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class CurrentUserPetsList implements UserProfileObserver {
     private static CurrentUserPetsList currentUserPetsList = null;
@@ -27,13 +29,14 @@ public class CurrentUserPetsList implements UserProfileObserver {
 //        getPetsData();
     }
 
-    public static CurrentUserPetsList getInstance(){
+    public static CurrentUserPetsList getInstance() {
         if (currentUserPetsList == null)
             currentUserPetsList = new CurrentUserPetsList();
         return currentUserPetsList;
     }
 
     public List<PetProfile> getPets() {
+        removeDuplicates();
         return pets;
     }
 
@@ -59,13 +62,18 @@ public class CurrentUserPetsList implements UserProfileObserver {
                     }
                 });
             }
-        }
-        else {
+        } else {
             isPetsListLoaded = true;
             notifyObservers();
         }
     }
 
+    private void removeDuplicates() {
+        Map<String, PetProfile> petProfileMap = pets.stream()
+                .collect(Collectors.toMap(PetProfile::getId, petProfile -> petProfile, (oldValue, newValue) -> oldValue));
+
+        pets = new ArrayList<>(petProfileMap.values());
+    }
 
     public boolean isPetsListLoaded() {
         return isPetsListLoaded;

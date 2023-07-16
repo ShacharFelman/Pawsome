@@ -54,12 +54,14 @@ public class CurrentUser {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
-                    userProfile = (snapshot.getValue(UserProfile.class));
-                    getPetListData(userId);
+                    if(CurrentUser.getInstance().getUid().equals(snapshot.getValue(UserProfile.class).getUid())) {
+                        userProfile = (snapshot.getValue(UserProfile.class));
+                        getPetListData(userId);
+                    }
                 }
-                else
-                    userProfile = null;
-            }
+                else if(CurrentUser.getInstance().getUid().equals(snapshot.getValue(UserProfile.class).getUid()))
+                        userProfile = null;
+                }
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
             }
