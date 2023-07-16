@@ -120,8 +120,8 @@ public class HomeFragment extends Fragment implements PetWalksObserver, PetMeals
 
         Glide.
                 with(getContext()).
-                load(lastWalk.getOwner().getProfileImage()).
-                into(binding.homeITMWalk.walkIMGUser);
+                load(lastMeal.getOwner().getProfileImage()).
+                into(binding.homeITMMeal.mealIMGUser);
 
         if(lastMeal.getOwner().getUid().equals(CurrentUser.getInstance().getUid()))
             binding.homeITMMeal.mealCVItem.setStrokeWidth(5);

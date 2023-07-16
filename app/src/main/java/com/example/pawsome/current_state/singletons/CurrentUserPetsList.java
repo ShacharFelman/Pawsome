@@ -24,7 +24,7 @@ public class CurrentUserPetsList implements UserProfileObserver {
 
     private CurrentUserPetsList() {
         CurrentUser.getInstance().registerListener(this);
-        getPetsData();
+//        getPetsData();
     }
 
     public static CurrentUserPetsList getInstance(){
@@ -59,6 +59,10 @@ public class CurrentUserPetsList implements UserProfileObserver {
                     }
                 });
             }
+        }
+        else {
+            isPetsListLoaded = true;
+            notifyObservers();
         }
     }
 

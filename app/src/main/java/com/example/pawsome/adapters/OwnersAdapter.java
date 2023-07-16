@@ -53,9 +53,10 @@ public class OwnersAdapter extends RecyclerView.Adapter<OwnersAdapter.OwnerViewH
         UserProfile owner = getItem(position);
 
         String ownerName = owner.getName();
-        if(ownerName.equals(CurrentUser.getInstance().getUserProfile().getName()))
-           ownerName += " (You)";
-
+        if(ownerName.equals(CurrentUser.getInstance().getUserProfile().getName())) {
+            ownerName += " (You)";
+            holder.owner_BTN_delete.setVisibility(View.GONE);
+        }
 
         holder.owner_TV_name.setText(ownerName);
         Glide.

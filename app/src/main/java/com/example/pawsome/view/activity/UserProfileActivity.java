@@ -37,7 +37,7 @@ public class UserProfileActivity extends AppCompatActivity {
     private String fileName;
     private ActivityResultLauncher<Intent> imagePickerLauncher;
     private boolean isImageUploaded = true;
-    private boolean isNewUesr = false;
+    private boolean isNewUser = false;
     private boolean isFromActivityMain = false;
 
 
@@ -47,10 +47,10 @@ public class UserProfileActivity extends AppCompatActivity {
         binding = ActivityUserProfileBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        isNewUesr = getIntent().getBooleanExtra(Constants.KEY_NEW_USER, true);
+        isNewUser = getIntent().getBooleanExtra(Constants.KEY_NEW_USER, true);
         isFromActivityMain = getIntent().getBooleanExtra(Constants.KEY_FROM_MAIN, true);
 
-        if (!isNewUesr) {
+        if (!isNewUser) {
             binding.profileBTNHome.setVisibility(View.VISIBLE);
             binding.profileBTNHome.setText("Back");
         } else {
@@ -262,7 +262,7 @@ public class UserProfileActivity extends AppCompatActivity {
     }
 
     private void profileSaved() {
-        if (isNewUesr) {
+        if (isNewUser) {
             binding.profileBTNSave.setEnabled(false);
             binding.profileBTNSave.setText("Profile Saved");
             binding.profileLAYNewPet.setVisibility(View.VISIBLE);

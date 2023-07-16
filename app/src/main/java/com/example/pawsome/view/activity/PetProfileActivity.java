@@ -859,7 +859,6 @@ public class PetProfileActivity extends AppCompatActivity {
         }
 
         if (!petProfile.getOwnersIds().contains(user.getUid())) {
-            Log.d("aaa", "addOwnerToPet: owner " + user.getName() + " added to pet " + petProfile.getName());
             petProfile.addOwner(user.getUid());
             isOwnerAdded = true;
         }

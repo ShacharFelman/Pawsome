@@ -6,14 +6,11 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.pawsome.adapters.PetsCurrentAdapter;
-import com.example.pawsome.callbacks.PetCurrentCallback;
-import com.example.pawsome.callbacks.PetListCallback;
 import com.example.pawsome.current_state.observers.UserPetsListObserver;
 import com.example.pawsome.current_state.singletons.CurrentPet;
 import com.example.pawsome.current_state.singletons.CurrentUser;
@@ -25,8 +22,7 @@ import com.example.pawsome.view.activity.MainActivity;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TopFragment extends Fragment implements UserPetsListObserver {
-
+public class TopFragment extends Fragment /* implements UserPetsListObserver */ {
 
     private FragmentTopBinding binding;
     private PetsCurrentAdapter petsCurrentAdapter;
@@ -38,8 +34,16 @@ public class TopFragment extends Fragment implements UserPetsListObserver {
         View root = binding.getRoot();
 
         initButtonsListeners();
-        CurrentUserPetsList.getInstance().registerListener(this);
         setUserNameView();
+//        CurrentUserPetsList.getInstance().registerListener(this);
+
+        if(CurrentUser.getInstance().getUserProfile().hasPets()) {
+                pets = CurrentUserPetsList.getInstance().getPets();
+                binding.topTVEmpty.setVisibility(View.GONE);
+                initPetListView();
+        }
+        else
+            binding.topTVEmpty.setVisibility(View.VISIBLE);
 
         return root;
     }
@@ -48,15 +52,7 @@ public class TopFragment extends Fragment implements UserPetsListObserver {
     public void onResume() {
         super.onResume();
 
-        if(CurrentUser.getInstance().getUserProfile().hasPets()) {
-            if (CurrentUserPetsList.getInstance().isPetsListLoaded()) {
-                pets = CurrentUserPetsList.getInstance().getPets();
-                binding.topTVEmpty.setVisibility(View.GONE);
-                initPetListView();
-            }
-        }
-        else
-            binding.topTVEmpty.setVisibility(View.VISIBLE);
+
     }
 
     private void initButtonsListeners() {
@@ -67,7 +63,6 @@ public class TopFragment extends Fragment implements UserPetsListObserver {
         petsCurrentAdapter = new PetsCurrentAdapter(this, pets);
         binding.topLSTPets.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
         binding.topLSTPets.setAdapter(petsCurrentAdapter);
-        Log.d("aaa", "onResume: pets list size: " + pets.size());
         setCurrentPetsListCallbacks();
     }
 
@@ -87,7 +82,7 @@ public class TopFragment extends Fragment implements UserPetsListObserver {
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
-        CurrentUserPetsList.getInstance().unregisterListener(this);
+//        CurrentUserPetsList.getInstance().unregisterListener(this);
     }
 
     @Override
@@ -95,10 +90,10 @@ public class TopFragment extends Fragment implements UserPetsListObserver {
         super.onPause();
     }
 
-    @Override
-    public void onPetsListChanged() {
-        pets = CurrentUserPetsList.getInstance().getPets();
-        initPetListView();
-    }
+//    @Override
+//    public void onPetsListChanged() {
+//        pets = CurrentUserPetsList.getInstance().getPets();
+//        initPetListView();
+//    }
 
 }

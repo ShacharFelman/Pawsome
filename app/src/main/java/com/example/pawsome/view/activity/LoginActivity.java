@@ -13,6 +13,7 @@ import com.example.pawsome.dal.DataCrud;
 import com.example.pawsome.dal.FirebaseDB;
 import com.example.pawsome.current_state.singletons.CurrentUser;
 import com.example.pawsome.model.UserProfile;
+import com.example.pawsome.utils.Constants;
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract;
 import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult;
@@ -57,9 +58,13 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void goToProfileActivity() {
+        Bundle bundle = new Bundle();
+        bundle.putBoolean(Constants.KEY_NEW_USER, true);
+        bundle.putBoolean(Constants.KEY_FROM_MAIN, false);
+
         Intent intent = new Intent(this, UserProfileActivity.class);
+        intent.putExtras(bundle);
         startActivity(intent);
-        finish();
     }
 
     private final ActivityResultLauncher<Intent> signInLauncher = registerForActivityResult(
@@ -79,9 +84,19 @@ public class LoginActivity extends AppCompatActivity {
                 .createSignInIntentBuilder()
                 .setAvailableProviders(providers)
                 .setIsSmartLockEnabled(false)
-                .setLogo(R.drawable.ic_app)
+                .setLogo(R.drawable.ic_launcher_background)
+                .setTheme(R.style.LoginTheme)
                 .build();
         signInLauncher.launch(signInIntent);
+
+//
+//        Intent signInIntent = AuthUI.getInstance()
+//                .createSignInIntentBuilder()
+//                .setAvailableProviders(providers)
+//                .setIsSmartLockEnabled(false)
+//                .setLogo(R.drawable.ic_app)
+//                .build();
+//        signInLauncher.launch(signInIntent);
     }
 
     private void loadUserProfile() {

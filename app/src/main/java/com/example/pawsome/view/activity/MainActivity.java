@@ -11,9 +11,7 @@ import com.example.pawsome.current_state.observers.UserPetsListObserver;
 import com.example.pawsome.current_state.singletons.CurrentPet;
 import com.example.pawsome.current_state.singletons.CurrentUser;
 import com.example.pawsome.current_state.singletons.CurrentUserPetsList;
-import com.example.pawsome.dal.DataCrud;
 import com.example.pawsome.databinding.ActivityMainBinding;
-import com.example.pawsome.model.PetProfile;
 import com.example.pawsome.utils.Constants;
 import com.example.pawsome.view.fragment.AddMealFragment;
 import com.example.pawsome.view.fragment.AddWalkFragment;
@@ -23,15 +21,11 @@ import com.example.pawsome.view.fragment.SettingsFragment;
 import com.example.pawsome.view.fragment.TopFragment;
 import com.example.pawsome.view.fragment.WalkLogFragment;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.ValueEventListener;
 
 public class MainActivity extends AppCompatActivity implements UserPetsListObserver {
 
@@ -42,7 +36,7 @@ public class MainActivity extends AppCompatActivity implements UserPetsListObser
     private static final int menu_add = R.id.menu_FRG_add;
     private static final int menu_walks = R.id.menu_FRG_walks;
     private static final int menu_settings = R.id.menu_FRG_settings;
-    private boolean isFirstTime = true;
+    private boolean isActivityVisible = true;
 
     private ActivityMainBinding binding;
 
@@ -53,8 +47,6 @@ public class MainActivity extends AppCompatActivity implements UserPetsListObser
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        isFirstTime = true;
-
         CurrentUserPetsList.getInstance().registerListener(this);
         setBottomNaviMenuListener();
 
@@ -64,18 +56,18 @@ public class MainActivity extends AppCompatActivity implements UserPetsListObser
         else {
             setNoPets();
         }
+    }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        isActivityVisible = true;
+    }
 
-
-
-        if(!CurrentUser.getInstance().getUserProfile().hasPets()) {
-            setNoPets();
-        }
-        else {
-            CurrentUserPetsList.getInstance().getPetsData();
-//            loadPetProfile(CurrentUser.getInstance().getUserProfile().getPetsIds().get(0));
-        }
-
+    @Override
+    protected void onPause() {
+        super.onPause();
+        isActivityVisible = false;
     }
 
     private void setBottomNaviMenuListener() {
@@ -198,22 +190,25 @@ public class MainActivity extends AppCompatActivity implements UserPetsListObser
     }
 
     @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        CurrentUserPetsList.getInstance().unregisterListener(this);
+    }
+
+    @Override
     public void onPetsListChanged() {
+        if(!isActivityVisible)
+            return;
+
         if(!CurrentUser.getInstance().getUserProfile().hasPets()) {
             setNoPets();
         }
         else {
-            if(isFirstTime) {
-                isFirstTime = false;
-                setTopFragment();
-                binding.mainBNVMenu.setSelectedItemId(menu_home);
-            }
-            else {
-                setBottomNaviMenuListener();
-            }
-
             if(CurrentPet.getInstance().getPetProfile() == null)
                 CurrentPet.getInstance().setPetProfile(CurrentUserPetsList.getInstance().getPets().get(0));
+
+            setTopFragment();
+            binding.mainBNVMenu.setSelectedItemId(menu_home);
         }
     }
 }

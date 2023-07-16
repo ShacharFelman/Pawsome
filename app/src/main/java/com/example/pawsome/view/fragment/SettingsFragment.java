@@ -14,6 +14,7 @@ import com.bumptech.glide.Glide;
 import com.example.pawsome.adapters.PetsListAdapter;
 import com.example.pawsome.callbacks.PetListCallback;
 import com.example.pawsome.current_state.singletons.CurrentUser;
+import com.example.pawsome.current_state.singletons.CurrentUserPetsList;
 import com.example.pawsome.dal.DataCrud;
 import com.example.pawsome.databinding.FragmentSettingsBinding;
 import com.example.pawsome.model.PetProfile;
@@ -134,6 +135,7 @@ public class SettingsFragment extends Fragment {
 
         pets.remove(pet);
         petsListAdapter.notifyDataSetChanged();
+        CurrentUserPetsList.getInstance().getPetsData();
     }
 
     private void goToProfileActivity() {
