@@ -36,6 +36,21 @@
         android:textStyle="bold"
         android:textColor="@color/white"/>
 
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/top_TV_empty"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"
+        android:layout_below="@id/top_TV_title"
+        android:textSize="20sp"
+        android:text="@string/prompt_no_pets"
+        android:gravity="center"
+        android:textStyle="bold"
+        android:textColor="@color/white"
+        android:visibility="gone"/>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/top_LST_pets"
         android:layout_width="wrap_content"

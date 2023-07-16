@@ -14,7 +14,6 @@ public class Meal {
     private long dateTime;
     private String note;
     private MealType mealType;
-
     private String name;
 
     private int amount;

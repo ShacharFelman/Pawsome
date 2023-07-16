@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/meal_CV_item"
     android:layout_width="match_parent"
-    android:layout_height="120dp"
+    android:layout_height="130dp"
     app:cardCornerRadius="20dp"
     app:cardElevation="10dp"
     android:layout_marginVertical="5dp"

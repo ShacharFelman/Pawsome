@@ -26,12 +26,14 @@ public class PetProfile {
     private List<Meal> meals = new ArrayList<>();
     private List<Walk> walks = new ArrayList<>();
 
-
-    // TODO: change to walkType
-
     public PetProfile() {
         this.id = UUID.randomUUID().toString();
         this.profileImage = Constants.DEFAULT_PET_IMAGE_URL;
+        this.ownersIds = new ArrayList<>();
+        this.mealTypes = new ArrayList<>();
+        this.walkTypes = new ArrayList<>();
+        this.meals = new ArrayList<>();
+        this.walks = new ArrayList<>();
     }
 
     public String getId() {
@@ -76,6 +78,8 @@ public class PetProfile {
 
     public PetProfile setOwnersIds(List<String> ownersIds) {
         this.ownersIds = ownersIds;
+        if(ownersIds == null)
+            this.ownersIds = new ArrayList<>();
         return this;
     }
 
@@ -94,6 +98,8 @@ public class PetProfile {
 
     public PetProfile setMealTypes(List<MealType> mealTypes) {
         this.mealTypes = mealTypes;
+        if (mealTypes == null)
+            this.mealTypes = new ArrayList<>();
         return this;
     }
 
@@ -103,6 +109,8 @@ public class PetProfile {
 
     public PetProfile setMeals(List<Meal> meals) {
         this.meals = meals;
+        if (meals == null)
+            this.meals = new ArrayList<>();
         return this;
     }
 
@@ -112,6 +120,8 @@ public class PetProfile {
 
     public PetProfile setWalkTypes(List<WalkType> walkTypes) {
         this.walkTypes = walkTypes;
+        if (walkTypes == null)
+            this.walkTypes = new ArrayList<>();
         return this;
     }
 
@@ -121,6 +131,8 @@ public class PetProfile {
 
     public PetProfile setWalks(List<Walk> walks) {
         this.walks = walks;
+        if (walks == null)
+            this.walks = new ArrayList<>();
         return this;
     }
 
@@ -138,11 +150,22 @@ public class PetProfile {
         this.meals.add(meal);
     }
 
+    public void addWalk(Walk walk) {
+        this.walks.add(walk);
+    }
+
     public boolean addMealType(MealType mealType) {
         if(this.mealTypes.contains(mealType))
             return false;
 
         return this.mealTypes.add(mealType);
+    }
+
+    public boolean addWalkType(WalkType walkType) {
+        if(this.walkTypes.contains(walkType))
+            return false;
+
+        return this.walkTypes.add(walkType);
     }
 
     public boolean isOnlyOneOwner() {

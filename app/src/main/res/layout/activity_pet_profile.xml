@@ -41,9 +41,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:paddingStart="60dp"
                 android:paddingTop="10dp"
-                android:paddingEnd="60dp"
                 android:scrollbars="vertical">
 
                 <RelativeLayout
@@ -73,7 +71,8 @@
                 <androidx.appcompat.widget.LinearLayoutCompat
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="60dp">
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/pet_BTN_owners_list"
@@ -168,6 +167,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/hint_pet_name"
+                    android:paddingHorizontal="60dp"
                     android:layout_marginTop="10dp">
 
                     <com.google.android.material.textfield.TextInputEditText
@@ -180,6 +180,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="5dp"
                     android:text="@string/hint_gender"
+                    android:paddingHorizontal="60dp"
                     android:textSize="12sp"/>
 
                 <androidx.appcompat.widget.AppCompatSpinner
@@ -188,13 +189,17 @@
                     android:layout_height="wrap_content"
                     android:dropDownWidth="250dp"
                     android:entries="@array/Gender"
-                    android:padding="10dp"/>
+                    android:padding="10dp"
+                    android:layout_marginHorizontal="60dp"
+                    />
 
 
                 <androidx.appcompat.widget.LinearLayoutCompat
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="60dp">
+
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/pet_EDT_date_of_birth"
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
@@ -253,12 +258,12 @@
 
                         <androidx.recyclerview.widget.RecyclerView
                             android:id="@+id/pet_LST_meals"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            tools:listitem="@layout/item_meal_type"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            tools:listitem="@layout/item_lst_meal_type"
                             android:layout_centerHorizontal="true"
                             android:paddingVertical="5dp"
-                            android:paddingHorizontal="5dp"
+                            android:paddingHorizontal="10dp"
                             tools:itemCount="3"/>
 
                     </androidx.appcompat.widget.LinearLayoutCompat>
@@ -289,6 +294,16 @@
                             app:strokeColor="@color/colorPrimaryDark"
                             android:textAllCaps="false" />
 
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/pet_LST_walks"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            tools:listitem="@layout/item_lst_walk_type"
+                            android:layout_centerHorizontal="true"
+                            android:paddingVertical="5dp"
+                            android:paddingHorizontal="10dp"
+                            tools:itemCount="3"/>
+
                     </androidx.appcompat.widget.LinearLayoutCompat>
 
                 </androidx.appcompat.widget.LinearLayoutCompat>
@@ -310,6 +325,10 @@
 
         <include layout="@layout/card_add_meal_type"
             android:id="@+id/pet_CV_add_meal_type"
+            android:visibility="invisible"/>
+
+        <include layout="@layout/card_add_walk_type"
+            android:id="@+id/pet_CV_add_walk_type"
             android:visibility="invisible"/>
 
     </RelativeLayout>

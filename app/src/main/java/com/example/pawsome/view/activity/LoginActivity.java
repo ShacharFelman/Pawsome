@@ -97,8 +97,9 @@ public class LoginActivity extends AppCompatActivity {
                         createUser();
                     if (!CurrentUser.getInstance().getUserProfile().getRegistered())
                         goToProfileActivity();
-                    else
+                    else {
                         goToMainActivity();
+                    }
                 }
             }
         });

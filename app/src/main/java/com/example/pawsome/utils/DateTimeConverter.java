@@ -1,10 +1,13 @@
 package com.example.pawsome.utils;
 
+import com.example.pawsome.model.WalkType;
+
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 
 public class DateTimeConverter {
 
@@ -52,6 +55,20 @@ public class DateTimeConverter {
 
     public static String longToStringTime(long dateTime) {
         return DateTimeConverter.longToLocalDateTime(dateTime).format(DateTimeFormatter.ofPattern(Constants.FORMAT_TIME));
+    }
+
+    public static int durationToDurationInMinutes(int minutes, int hours) {
+        return minutes + hours * 60;
+    }
+
+    public static String durationToString(int hours, int minutes) {
+        return String.format(Locale.getDefault(), "%02d:%02d", hours, minutes);
+    }
+
+    public static String durationInMinutesToString(int durationInMinutes) {
+        int hours = durationInMinutes / 60;
+        int minutes = durationInMinutes % 60;
+        return String.format(Locale.getDefault(), "%02d:%02d", hours, minutes);
     }
 
 

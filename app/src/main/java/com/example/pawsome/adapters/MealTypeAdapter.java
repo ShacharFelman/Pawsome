@@ -14,7 +14,6 @@ import com.example.pawsome.model.MealType;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textview.MaterialTextView;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class MealTypeAdapter extends RecyclerView.Adapter<MealTypeAdapter.MealTypeViewHolder> {
@@ -31,11 +30,11 @@ public class MealTypeAdapter extends RecyclerView.Adapter<MealTypeAdapter.MealTy
     @NonNull
     @Override
     public MealTypeViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_meal_type, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_lst_meal_type, parent, false);
         return new MealTypeViewHolder(view);
     }
 
-    public MealTypeAdapter setGroupCallback(MealTypeCallback mealTypeCallback) {
+    public MealTypeAdapter setMealTypeCallback(MealTypeCallback mealTypeCallback) {
         this.mealTypeCallback = mealTypeCallback;
         return this;
     }

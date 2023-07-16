@@ -47,6 +47,19 @@
     <string name="img_desc_meal_icon">Meal icon</string>
     <string name="img_desc_pet_icon">Pet icon</string>
     <string name="img_desc_walk_icon" >Walk icon</string>
+    <string name="title_add_walk_type">Add Walk Type</string>
+    <string name="hint_walk_name">Walk Name</string>
+    <string name="hint_walk_time">Walk Time</string>
+    <string name="hint_walk_duration">Duration</string>
+    <string name="hint_poop">Poop</string>
+    <string name="hint_pee">Pee</string>
+    <string name="hint_play">Play</string>
+    <string name="title_add_walk">Add Walk</string>
+    <string name="hint_walk_rate">Rate the walk</string>
+    <string name="prompt_empty_walks_list">No Walks To Show</string>
+    <string name="title_last_walk">Last Walk</string>
+    <string name="title_last_meal">Last Meal</string>
+    <string name="prompt_no_pets">You have no pets :)</string>
 
     <string-array name="Gender">
         <item>Male</item>

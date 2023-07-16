@@ -1,5 +1,7 @@
 package com.example.pawsome.current_state.singletons;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -7,7 +9,6 @@ import com.example.pawsome.current_state.observers.PetMealsObserver;
 import com.example.pawsome.current_state.observers.PetWalksObserver;
 import com.example.pawsome.dal.DataCrud;
 import com.example.pawsome.model.PetProfile;
-import com.example.pawsome.utils.Constants;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -50,22 +51,22 @@ public class CurrentPet {
             DataCrud.getInstance().getPetReference(petProfile.getId()).child("meals").addChildEventListener(new ChildEventListener() {
                 @Override
                 public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                    getPetData();
+                    readPetData();
                 }
 
                 @Override
                 public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                    getPetData();
+                    readPetData();
                 }
 
                 @Override
                 public void onChildRemoved(@NonNull DataSnapshot snapshot) {
-                    getPetData();
+                    readPetData();
                 }
 
                 @Override
                 public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                    getPetData();
+                    readPetData();
                 }
 
                 @Override
@@ -80,22 +81,22 @@ public class CurrentPet {
             DataCrud.getInstance().getPetReference(petProfile.getId()).child("walks").addChildEventListener(new ChildEventListener() {
                 @Override
                 public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                    getPetData();
+                    readPetData();
                 }
 
                 @Override
                 public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                    getPetData();
+                    readPetData();
                 }
 
                 @Override
                 public void onChildRemoved(@NonNull DataSnapshot snapshot) {
-                    getPetData();
+                    readPetData();
                 }
 
                 @Override
                 public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                    getPetData();
+                    readPetData();
                 }
 
                 @Override
@@ -105,11 +106,11 @@ public class CurrentPet {
         }
     }
 
-    private void getPetData() {
+    private void readPetData() {
         if (petProfile == null)
             return;
 
-        DataCrud.getInstance().getPetReference(petProfile.getId()).addListenerForSingleValueEvent(new ValueEventListener() {
+        DataCrud.getInstance().getPetReference(petProfile.getId()).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
@@ -155,4 +156,6 @@ public class CurrentPet {
             observer.onWalksListChanged();
         }
     }
+
+
 }

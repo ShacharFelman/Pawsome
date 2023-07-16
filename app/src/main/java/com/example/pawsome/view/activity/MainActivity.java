@@ -4,11 +4,13 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.MenuItem;
 
 import com.example.pawsome.R;
 import com.example.pawsome.current_state.observers.UserPetsListObserver;
 import com.example.pawsome.current_state.singletons.CurrentPet;
 import com.example.pawsome.current_state.singletons.CurrentUser;
+import com.example.pawsome.current_state.singletons.CurrentUserPetsList;
 import com.example.pawsome.dal.DataCrud;
 import com.example.pawsome.databinding.ActivityMainBinding;
 import com.example.pawsome.model.PetProfile;
@@ -40,6 +42,7 @@ public class MainActivity extends AppCompatActivity implements UserPetsListObser
     private static final int menu_add = R.id.menu_FRG_add;
     private static final int menu_walks = R.id.menu_FRG_walks;
     private static final int menu_settings = R.id.menu_FRG_settings;
+    private boolean isFirstTime = true;
 
     private ActivityMainBinding binding;
 
@@ -50,14 +53,27 @@ public class MainActivity extends AppCompatActivity implements UserPetsListObser
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+        isFirstTime = true;
+
+        CurrentUserPetsList.getInstance().registerListener(this);
         setBottomNaviMenuListener();
-        binding.mainBNVMenu.setSelectedItemId(R.id.menu_FRG_home);
+
+        if(CurrentUser.getInstance().getUserProfile().hasPets()) {
+            CurrentUserPetsList.getInstance().getPetsData();
+        }
+        else {
+            setNoPets();
+        }
+
+
+
 
         if(!CurrentUser.getInstance().getUserProfile().hasPets()) {
             setNoPets();
         }
         else {
-            loadPetProfile(CurrentUser.getInstance().getUserProfile().getPetsIds().get(0));
+            CurrentUserPetsList.getInstance().getPetsData();
+//            loadPetProfile(CurrentUser.getInstance().getUserProfile().getPetsIds().get(0));
         }
 
     }
@@ -123,9 +139,24 @@ public class MainActivity extends AppCompatActivity implements UserPetsListObser
         alertDialog.getWindow().setGravity(Gravity.BOTTOM);
     }
 
+//    private void setNoPets() {
+//        binding.mainBNVMenu.setEnabled(false);
+//        setTopFragment();
+//    }
+
     private void setNoPets() {
-        binding.mainBNVMenu.setEnabled(false);
+        for (int i = 0; i < binding.mainBNVMenu.getMenu().size(); i++) {
+            MenuItem menuItem = binding.mainBNVMenu.getMenu().getItem(i);
+            if (menuItem.getItemId() == menu_settings) {
+                menuItem.setEnabled(true);
+            } else {
+                menuItem.setEnabled(false);
+            }
+        }
+        setTopFragment();
+        binding.mainBNVMenu.setSelectedItemId(menu_settings);
     }
+
 
     public void goToProfileActivity() {
         Bundle bundle = new Bundle();
@@ -158,29 +189,12 @@ public class MainActivity extends AppCompatActivity implements UserPetsListObser
     }
 
     public void signOut() {
+        CurrentPet.getInstance().setPetProfile(null);
+        CurrentUser.getInstance().setUserProfile(null);
         FirebaseAuth.getInstance().signOut();
         Intent intent = new Intent(this, LoginActivity.class);
         startActivity(intent);
         finish();
-    }
-
-    private void loadPetProfile(String petId) {
-        binding.mainBNVMenu.setEnabled(false);
-        DataCrud.getInstance().getPetReference(petId).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.exists()) {
-                    CurrentPet.getInstance().setPetProfile(snapshot.getValue(PetProfile.class));
-                    binding.mainBNVMenu.setEnabled(true);
-                    setTopFragment();
-                }
-                else {
-                }
-            }
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-            }
-        });
     }
 
     @Override
@@ -189,7 +203,17 @@ public class MainActivity extends AppCompatActivity implements UserPetsListObser
             setNoPets();
         }
         else {
-            loadPetProfile(CurrentUser.getInstance().getUserProfile().getPetsIds().get(0));
+            if(isFirstTime) {
+                isFirstTime = false;
+                setTopFragment();
+                binding.mainBNVMenu.setSelectedItemId(menu_home);
+            }
+            else {
+                setBottomNaviMenuListener();
+            }
+
+            if(CurrentPet.getInstance().getPetProfile() == null)
+                CurrentPet.getInstance().setPetProfile(CurrentUserPetsList.getInstance().getPets().get(0));
         }
     }
 }

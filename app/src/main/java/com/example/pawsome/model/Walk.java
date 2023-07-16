@@ -11,6 +11,7 @@ public class Walk {
     private WalkType walkType;
     private boolean poop;
     private boolean pee;
+    private boolean play;
     private double rate;
     private String name;
 
@@ -98,8 +99,17 @@ public class Walk {
         return this;
     }
 
-    public Walk setDuration(int minutes, int hours) {
+    public Walk setDuration(int hours, int minutes) {
         this.durationInMinutes = minutes + hours * 60;
+        return this;
+    }
+
+    public boolean getPlay() {
+        return play;
+    }
+
+    public Walk setPlay(boolean play) {
+        this.play = play;
         return this;
     }
 

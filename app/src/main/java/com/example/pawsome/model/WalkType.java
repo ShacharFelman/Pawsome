@@ -1,5 +1,9 @@
 package com.example.pawsome.model;
 
+import com.example.pawsome.utils.Constants;
+
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.Objects;
 
@@ -9,6 +13,7 @@ public class WalkType {
     private int durationInMinutes;
     private boolean poop;
     private boolean pee;
+    private boolean play;
     private double rate;
     private String name;
 
@@ -42,7 +47,7 @@ public class WalkType {
         return this;
     }
 
-    public boolean isPoop() {
+    public boolean getPoop() {
         return poop;
     }
 
@@ -51,7 +56,7 @@ public class WalkType {
         return this;
     }
 
-    public boolean isPee() {
+    public boolean getPee() {
         return pee;
     }
 
@@ -69,7 +74,7 @@ public class WalkType {
         return this;
     }
 
-    public WalkType setDuration(int minutes, int hours) {
+    public WalkType setDuration(int hours, int minutes) {
         this.durationInMinutes = minutes + hours * 60;
         return this;
     }
@@ -78,6 +83,21 @@ public class WalkType {
         int hours = this.durationInMinutes / 60;
         int minutes = this.durationInMinutes % 60;
         return String.format(Locale.getDefault(), "%02d:%02d", hours, minutes);
+    }
+
+    public WalkType setTimeFromString(String timeString) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(Constants.FORMAT_TIME);
+        this.time = LocalTime.parse(timeString, formatter).toSecondOfDay();
+        return this;
+    }
+
+    public boolean getPlay() {
+        return play;
+    }
+
+    public WalkType setPlay(boolean play) {
+        this.play = play;
+        return this;
     }
 
     @Override

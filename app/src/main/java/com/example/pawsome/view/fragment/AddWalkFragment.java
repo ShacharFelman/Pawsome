@@ -1,66 +1,332 @@
 package com.example.pawsome.view.fragment;
 
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.NumberPicker;
+
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
 
 import com.example.pawsome.R;
+import com.example.pawsome.current_state.singletons.CurrentPet;
+import com.example.pawsome.current_state.singletons.CurrentUser;
+import com.example.pawsome.dal.DataCrud;
+import com.example.pawsome.databinding.FragmentAddWalkBinding;
+import com.example.pawsome.model.Meal;
+import com.example.pawsome.model.MealType;
+import com.example.pawsome.model.UserProfile;
+import com.example.pawsome.model.Walk;
+import com.example.pawsome.model.WalkType;
+import com.example.pawsome.utils.Constants;
+import com.example.pawsome.utils.DateTimeConverter;
+import com.example.pawsome.view.activity.MainActivity;
+import com.google.android.material.datepicker.MaterialDatePicker;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.timepicker.MaterialTimePicker;
+import com.google.android.material.timepicker.TimeFormat;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.ValueEventListener;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link AddWalkFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
+
 public class AddWalkFragment extends Fragment {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    private FragmentAddWalkBinding binding;
+    private List<String> walkTypes;
+    private WalkType selectedWalkType;
+    private List<UserProfile> owners;
+    private UserProfile selectedOwner;
+    private String note;
+    private int duration_hours = 0;
+    private int duration_minutes = 0;
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
 
-    public AddWalkFragment() {
-        // Required empty public constructor
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             ViewGroup container, Bundle savedInstanceState) {
+        binding = FragmentAddWalkBinding.inflate(inflater, container, false);
+        View root = binding.getRoot();
+
+        if (CurrentPet.getInstance().getPetProfile() != null)
+            updateFragmentData();
+
+        return root;
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment AddWalkFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static AddWalkFragment newInstance(String param1, String param2) {
-        AddWalkFragment fragment = new AddWalkFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
+    private void updateFragmentData() {
+        getWalksTypesList();
+        initWalkTypesSpinner();
+        setWalkTypeDataInView();
+        setCurrentDateTimeSelected();
+
+        getOwnersList();
+
+        initListeners();
     }
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+    private void initListeners() {
+        binding.addWalkACTVWalkType.setOnItemClickListener((parent, view, position, id) -> {
+            this.selectedWalkType = getSelectedWalkType();
+            setWalkTypeDataInView();
+        });
+
+        binding.addWalkACTVOwner.setOnItemClickListener((parent, view, position, id) -> this.selectedOwner = (UserProfile) parent.getItemAtPosition(position));
+        binding.addWalkBTNSave.setOnClickListener(v -> saveWalk());
+        binding.addWalkBTNDuration.setOnClickListener(v -> setDuration());
+        binding.addWalkBTNTime.setOnClickListener(v -> setTime());
+        binding.addWalkBTNDate.setOnClickListener(v -> setDate());
+        binding.addWalkBTNAddNote.setOnClickListener(v -> showAddNote());
+        binding.addWalkCVNote.noteBTNCancel.setOnClickListener(v -> hideAddNote());
+        binding.addWalkCVNote.noteBTNSave.setOnClickListener(v -> saveNoteText());
+    }
+
+    private void showAddNote() {
+        binding.addWalkCVNote.getRoot().setVisibility(View.VISIBLE);
+        disableWalkFields();
+    }
+
+    private void hideAddNote() {
+        binding.addWalkCVNote.getRoot().setVisibility(View.GONE);
+        enableWalkFields();
+    }
+
+    private void saveNoteText() {
+        note = binding.addWalkCVNote.noteEDTNote.getEditText().getText().toString();
+        hideAddNote();
+    }
+
+    private void disableWalkFields() {
+        binding.addWalkTILWalkType.setEnabled(false);
+        binding.addWalkBTNDate.setEnabled(false);
+        binding.addWalkBTNTime.setEnabled(false);
+        binding.addWalkBTNDuration.setEnabled(false);
+        binding.addWalkEDTName.setEnabled(false);
+        binding.addWalkCBPee.setEnabled(false);
+        binding.addWalkCBPoop.setEnabled(false);
+        binding.addWalkCBPlay.setEnabled(false);
+        binding.addWalkTILOwner.setEnabled(false);
+        binding.addWalkBTNAddNote.setEnabled(false);
+        binding.addWalkBTNSave.setEnabled(false);
+        binding.addWalkSLDRate.setEnabled(false);
+    }
+
+    private void enableWalkFields() {
+        binding.addWalkTILWalkType.setEnabled(true);
+        binding.addWalkBTNDate.setEnabled(true);
+        binding.addWalkBTNTime.setEnabled(true);
+        binding.addWalkBTNDuration.setEnabled(true);
+        binding.addWalkEDTName.setEnabled(true);
+        binding.addWalkCBPee.setEnabled(true);
+        binding.addWalkCBPoop.setEnabled(true);
+        binding.addWalkCBPlay.setEnabled(true);
+        binding.addWalkTILOwner.setEnabled(true);
+        binding.addWalkBTNAddNote.setEnabled(true);
+        binding.addWalkBTNSave.setEnabled(true);
+        binding.addWalkSLDRate.setEnabled(true);
+    }
+
+    private void initWalkTypesSpinner() {
+        if (this.walkTypes == null || this.walkTypes.isEmpty())
+            binding.addWalkTILWalkType.setVisibility(View.GONE);
+        else {
+            ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_dropdown_item_1line, walkTypes);
+            binding.addWalkACTVWalkType.setAdapter(adapter);
         }
     }
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_add_walk, container, false);
+    private void initOwnersSpinner() {
+        if (this.owners == null || this.owners.isEmpty())
+            binding.addWalkTILWalkType.setVisibility(View.INVISIBLE);
+        else {
+            for (UserProfile owner : owners) {
+                if(owner.getUid().equals(CurrentUser.getInstance().getUid()))
+                    selectedOwner = owner;
+            }
+            if (selectedOwner == null)
+                selectedOwner = owners.get(0);
+
+            ArrayAdapter<UserProfile> adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_dropdown_item_1line, owners);
+            binding.addWalkACTVOwner.setAdapter(adapter);
+            binding.addWalkTILOwner.setVisibility(View.VISIBLE);
+            binding.addWalkACTVOwner.setText(selectedOwner.getName(), false);
+        }
     }
+
+    private void setTime() {
+        MaterialTimePicker timePicker = new MaterialTimePicker.Builder()
+                .setTimeFormat(TimeFormat.CLOCK_24H)
+                .setInputMode(MaterialTimePicker.INPUT_MODE_CLOCK)
+                .setHour(LocalTime.now().getHour())
+                .setMinute(LocalTime.now().getMinute())
+                .setTitleText("Select walk time")
+                .build();
+
+        timePicker.show(getParentFragmentManager(), "tag");
+        timePicker.addOnPositiveButtonClickListener(selection -> {
+            LocalTime selectedTime = LocalTime.of(timePicker.getHour(), timePicker.getMinute());
+            binding.addWalkEDTTime.getEditText().setText(selectedTime.format(DateTimeFormatter.ofPattern(Constants.FORMAT_TIME)));
+        });
+    }
+
+    private void setDate(){
+        MaterialDatePicker datePicker =
+                MaterialDatePicker.Builder.datePicker()
+                        .setTitleText("Select date")
+                        .setSelection(MaterialDatePicker.todayInUtcMilliseconds())
+                        .build();
+        datePicker.show(getParentFragmentManager(), "tag");
+        datePicker.addOnPositiveButtonClickListener(selection -> {
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat(Constants.FORMAT_DATE);
+            binding.addWalkEDTDate.getEditText().setText(simpleDateFormat.format(new Date((long)selection)));
+        });
+    }
+
+    private void setDuration() {
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(getContext(), R.style.DialogTheme);
+        LayoutInflater inflater = LayoutInflater.from(getContext());
+        View view = inflater.inflate(R.layout.dialog_duration_picker, null);
+
+        NumberPicker npHours = view.findViewById(R.id.dialog_duration_picker_NP_hours);
+        NumberPicker npMinutes = view.findViewById(R.id.dialog_duration_picker_NP_minutes);
+
+        npHours.setMinValue(0);
+        npHours.setMaxValue(23);
+        npMinutes.setMinValue(0);
+        npMinutes.setMaxValue(59);
+
+        builder.setView(view)
+                .setTitle("Select Duration")
+                .setPositiveButton("OK", (dialog, id) -> {
+                    duration_hours = npHours.getValue();
+                    duration_minutes = npMinutes.getValue();
+                    binding.addWalkEDTDuration.getEditText().setText(DateTimeConverter.durationToString(duration_hours, duration_minutes));
+                })
+                .setNegativeButton("Cancel", (dialog, id) -> {
+                })
+                .show();
+    }
+
+    private WalkType getSelectedWalkType() {
+        String selectedWalkTypeName = binding.addWalkACTVWalkType.getText().toString();
+        for (WalkType walkType : CurrentPet.getInstance().getPetProfile().getWalkTypes()) {
+            if (walkType.getName().equals(selectedWalkTypeName))
+                return walkType;
+        }
+        return null;
+    }
+
+    private UserProfile getSelectedOwner() {
+        String selectedOwnerName = binding.addWalkACTVOwner.getText().toString();
+        for (UserProfile owner : owners) {
+            if (owner.getName().equals(selectedOwnerName))
+                return owner;
+        }
+
+        return null;
+    }
+
+    private void setWalkTypeDataInView() {
+        if (this.selectedWalkType != null) {
+            if (selectedWalkType.getName() != null && !selectedWalkType.getName().isEmpty())
+                binding.addWalkEDTName.getEditText().setText(selectedWalkType.getName());
+
+            if (selectedWalkType.getDurationInMinutes() != 0)
+                binding.addWalkEDTDuration.getEditText().setText(selectedWalkType.getDurationAsString());
+
+            binding.addWalkCBPee.setChecked(selectedWalkType.getPee());
+            binding.addWalkCBPoop.setChecked(selectedWalkType.getPoop());
+            binding.addWalkCBPlay.setChecked(selectedWalkType.getPlay());
+        }
+    }
+
+    private void setCurrentDateTimeSelected() {
+        binding.addWalkEDTTime.getEditText().setText(LocalTime.now().format(DateTimeFormatter.ofPattern(Constants.FORMAT_TIME)));
+        binding.addWalkEDTDate.getEditText().setText(LocalDate.now().format(DateTimeFormatter.ofPattern(Constants.FORMAT_DATE)));
+    }
+
+    private void getWalksTypesList() {
+        if (CurrentPet.getInstance().getPetProfile() != null)
+            this.walkTypes = CurrentPet.getInstance().getPetProfile().getWalkTypes().stream().map(WalkType::getName).collect(Collectors.toList());
+
+        this.walkTypes.add(Constants.WALK_TYPE_OTHER);
+    }
+
+    private void getOwnersList() {
+        binding.addWalkTILOwner.setVisibility(View.INVISIBLE);
+
+        if (CurrentPet.getInstance().getPetProfile() != null) {
+            if (this.owners == null)
+                this.owners = new ArrayList<>();
+
+            for (String userId : CurrentPet.getInstance().getPetProfile().getOwnersIds()) {
+                DataCrud.getInstance().getUserReference(userId).addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if (snapshot.exists()) {
+                            UserProfile userProfile = snapshot.getValue(UserProfile.class);
+                            owners.add(userProfile);
+                            if (owners.size() == CurrentPet.getInstance().getPetProfile().getOwnersIds().size()) {
+                                initOwnersSpinner();
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                    }
+                });
+            }
+        }
+    }
+
+    private void saveWalk() {
+        if (CurrentPet.getInstance().getPetProfile() != null) {
+            Walk walk = new Walk();
+
+            String date = binding.addWalkEDTDate.getEditText().getText().toString();
+            String time = binding.addWalkEDTTime.getEditText().getText().toString();
+            LocalDateTime dateTime = LocalDateTime.parse(date + " " + time, DateTimeFormatter.ofPattern(Constants.FORMAT_DATE + " " + Constants.FORMAT_TIME));
+
+            walk
+                    .setName(binding.addWalkEDTName.getEditText().getText().toString())
+                    .setDuration(duration_hours, duration_minutes)
+                    .setPee(binding.addWalkCBPee.isChecked())
+                    .setPoop(binding.addWalkCBPoop.isChecked())
+                    .setPlay(binding.addWalkCBPlay.isChecked())
+                    .setNote(note)
+                    .setRate(binding.addWalkSLDRate.getValue())
+                    .setDateTime(DateTimeConverter.localDateTimeToLong(dateTime))
+                    .setOwner(getSelectedOwner());
+
+            CurrentPet.getInstance().getPetProfile().addWalk(walk);
+            DataCrud.getInstance().setPetInDB(CurrentPet.getInstance().getPetProfile());
+
+            ((MainActivity) getActivity()).selectWalkLogFragmentOnMenu();
+        }
+    }
+
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+    }
+
+
 }

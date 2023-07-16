@@ -37,7 +37,7 @@ public class CurrentUserPetsList implements UserProfileObserver {
         return pets;
     }
 
-    private void getPetsData() {
+    public void getPetsData() {
         if (CurrentUser.getInstance().getUserProfile().hasPets()) {
             isPetsListLoaded = false;
             pets.clear();
@@ -62,6 +62,7 @@ public class CurrentUserPetsList implements UserProfileObserver {
         }
     }
 
+
     public boolean isPetsListLoaded() {
         return isPetsListLoaded;
     }
@@ -78,6 +79,16 @@ public class CurrentUserPetsList implements UserProfileObserver {
         for (UserPetsListObserver observer : observers) {
             observer.onPetsListChanged();
         }
+    }
+
+    public CurrentUserPetsList setPets(List<PetProfile> pets) {
+        this.pets = pets;
+        return this;
+    }
+
+    public CurrentUserPetsList setPetsListLoaded(boolean petsListLoaded) {
+        isPetsListLoaded = petsListLoaded;
+        return this;
     }
 
     @Override

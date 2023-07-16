@@ -106,6 +106,6 @@ public class WalkLogFragment extends Fragment implements PetWalksObserver {
 
     @Override
     public void onWalksListChanged() {
-
+        updateFragmentData();
     }
 }

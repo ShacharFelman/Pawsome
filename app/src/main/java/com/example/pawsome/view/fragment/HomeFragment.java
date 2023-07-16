@@ -7,95 +7,157 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
-
+import com.bumptech.glide.Glide;
+import com.example.pawsome.adapters.WalksAdapter;
+import com.example.pawsome.callbacks.WalkCallback;
+import com.example.pawsome.current_state.observers.PetMealsObserver;
+import com.example.pawsome.current_state.observers.PetWalksObserver;
+import com.example.pawsome.current_state.singletons.CurrentPet;
+import com.example.pawsome.current_state.singletons.CurrentUser;
+import com.example.pawsome.dal.DataCrud;
 import com.example.pawsome.databinding.FragmentHomeBinding;
+import com.example.pawsome.databinding.FragmentWalkLogBinding;
 import com.example.pawsome.model.Meal;
-import com.example.pawsome.utils.Constants;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
+import com.example.pawsome.model.Walk;
+import com.example.pawsome.utils.DateTimeConverter;
 
-import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
-public class HomeFragment extends Fragment {
-
+public class HomeFragment extends Fragment implements PetWalksObserver, PetMealsObserver {
     private FragmentHomeBinding binding;
-//    private OffersAdapter offerAdapter;
-
+    private Walk lastWalk;
+    private Meal lastMeal;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentHomeBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
-//        loadOffers();
+
+        CurrentPet.getInstance().addWalksObserver(this);
+        CurrentPet.getInstance().addMealsObserver(this);
+
+        updateFragmentData();
+
         return root;
     }
 
-    private void initFragmentData() {
-        initViews();
-        setCallbacks();
-        initListeners();
+    private void updateFragmentData() {
+        if (isAdded()) { // checks if the fragment is currently added to its activity
+            getLastWalk();
+            getLastMeal();
+            setLastWalkView();
+            setLastMealView();
+        }
     }
 
-    private void initListeners() {
+
+    private void getLastWalk() {
+        if (CurrentPet.getInstance().getPetProfile() != null) {
+            List<Walk> walks = CurrentPet.getInstance().getPetProfile().getWalks();
+            walks.sort(Comparator.comparingLong(Walk::getDateTime).reversed());
+            if (!walks.isEmpty())
+                lastWalk = walks.get(0);
+        }
+    }
+
+    private void getLastMeal() {
+        if (CurrentPet.getInstance().getPetProfile() != null) {
+            List<Meal> meals = CurrentPet.getInstance().getPetProfile().getMeals();
+            meals.sort(Comparator.comparingLong(Meal::getDateTime).reversed());
+            if (!meals.isEmpty())
+                lastMeal = meals.get(0);
+        }
+    }
+
+    private void setLastWalkView() {
+        if(lastWalk == null) {
+            setNoWalksView();
+            return;
+        }
+
+        binding.homeTVWalk.setText("Last Walk");
+        binding.homeITMWalk.getRoot().setVisibility(View.VISIBLE);
+
+        binding.homeITMWalk.walkBTNDelete.setVisibility(View.GONE);
+        binding.homeITMWalk.walkTVUser.setText(lastWalk.getOwner().getName());
+        binding.homeITMWalk.walkTVTime.setText(DateTimeConverter.longToStringTime(lastWalk.getDateTime()));
+        binding.homeITMWalk.walkTVDate.setText(DateTimeConverter.longToStringDate(lastWalk.getDateTime()));
+        binding.homeITMWalk.walkTVNote.setText(lastWalk.getNote());
+        binding.homeITMWalk.walkTVTypeDuration.setText(lastWalk.getName() + ", " + lastWalk.getDurationInMinutes() + " min");
+        binding.homeITMWalk.walkIMGPoop.setVisibility(!lastWalk.isPoop() ? View.VISIBLE : View.GONE);
+        Glide.
+                with(getContext()).
+                load(lastWalk.getOwner().getProfileImage()).
+                into(binding.homeITMWalk.walkIMGUser);
+
+        if(lastWalk.getOwner().getUid().equals(CurrentUser.getInstance().getUid()))
+            binding.homeITMWalk.walkCVItem.setStrokeWidth(5);
+        else
+            binding.homeITMWalk.walkCVItem.setStrokeWidth(0);
 
     }
 
-    private void initViews() {
-//        if (meals == null || meals.isEmpty()) {
-//            binding.homeLSTOffers.setVisibility(View.GONE);
-//            binding.homeTVNoGroups.setVisibility(View.VISIBLE);
-//        } else {
-//            binding.homeLSTOffers.setVisibility(View.VISIBLE);
-//            binding.homeTVNoGroups.setVisibility(View.GONE);
-//        }
-//        offerAdapter = new OffersAdapter(this, meals);
-//        binding.homeLSTOffers.setLayoutManager(new LinearLayoutManager(getContext()));
-//        binding.homeLSTOffers.setAdapter(offerAdapter);
+    private void setLastMealView() {
+        if(lastMeal == null) {
+            setNoMealsView();
+            return;
+        }
+
+        binding.homeTVMeal.setText("Last Meal");
+        binding.homeITMMeal.getRoot().setVisibility(View.VISIBLE);
+
+        binding.homeITMMeal.mealBTNDelete.setVisibility(View.GONE);
+        binding.homeITMMeal.mealTVUser.setText(lastMeal.getOwner().getName());
+        binding.homeITMMeal.mealTVTime.setText(DateTimeConverter.longToStringTime(lastMeal.getDateTime()));
+        binding.homeITMMeal.mealTVDate.setText(DateTimeConverter.longToStringDate(lastMeal.getDateTime()));
+        binding.homeITMMeal.mealTVNote.setText(lastMeal.getNote());
+        binding.homeITMMeal.mealTVType.setText(lastMeal.getName());
+
+        Glide.
+                with(getContext()).
+                load(lastWalk.getOwner().getProfileImage()).
+                into(binding.homeITMWalk.walkIMGUser);
+
+        if(lastMeal.getOwner().getUid().equals(CurrentUser.getInstance().getUid()))
+            binding.homeITMMeal.mealCVItem.setStrokeWidth(5);
+        else
+            binding.homeITMMeal.mealCVItem.setStrokeWidth(0);
     }
 
-    private void setCallbacks() {
-//        offerAdapter.setOfferCallback(new OfferCallback() {
-//            @Override
-//            public void joinClicked(Offer offer, int position) {
-//                if (offer.getCapacity() <= offer.getNumOfUsers()) {
-//                    SignalSingleton.getInstance().toast("The group is full");
-//                } else {
-//                    CurrentUser.getInstance().getUserProfile().getOffers().put(offer.getId(), offer);
-//                    offer.addUser(CurrentUser.getInstance().getUserProfile().getUid());
-////                    databaseRef = FirebaseDatabase.getInstance().getReference(Constants.DB_USERS);
-////                    databaseRef.child(CurrentUser.getInstance().getUserProfile().getUid()).setValue(CurrentUser.getInstance().getUserProfile());
-//                    offerAdapter.removeOffer(offer.getId());
-//                    offerAdapter.notifyItemRemoved(position);
-//                }
-//            }
-//
-//            @Override
-//            public void itemClicked(Offer offer, int position) {
-//                //move to the offer page with the offer details
-//            }
-//
-////            @Override
-////            public void leaveClicked(Offer item, int position) {}
-//        });
+    private void setNoWalksView() {
+        binding.homeTVWalk.setText("No walks yet");
+        binding.homeITMWalk.getRoot().setVisibility(View.INVISIBLE);
+    }
 
+
+    private void setNoMealsView() {
+        binding.homeTVMeal.setText("No meals yet");
+        binding.homeITMMeal.getRoot().setVisibility(View.INVISIBLE);
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        binding = null;
+        CurrentPet.getInstance().removeWalksObserver(this);
     }
 
     @Override
     public void onPause() {
         super.onPause();
-//        binding.homeETSearch.setText(null);
+    }
+
+    @Override
+    public void onWalksListChanged() {
+        updateFragmentData();
+    }
+
+    @Override
+    public void onMealsListChanged() {
+        updateFragmentData();
     }
 }
