@@ -6,8 +6,9 @@ import android.util.Log;
 import android.view.Gravity;
 
 import com.example.pawsome.R;
-import com.example.pawsome.current_state.CurrentPet;
-import com.example.pawsome.current_state.CurrentUser;
+import com.example.pawsome.current_state.observers.UserPetsListObserver;
+import com.example.pawsome.current_state.singletons.CurrentPet;
+import com.example.pawsome.current_state.singletons.CurrentUser;
 import com.example.pawsome.dal.DataCrud;
 import com.example.pawsome.databinding.ActivityMainBinding;
 import com.example.pawsome.model.PetProfile;
@@ -30,7 +31,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements UserPetsListObserver {
 
     private static final int mainFragmentLocation = R.id.main_FRAME_fragments;
     private static final int topFragmentLocation = R.id.main_FRAME_top;
@@ -49,7 +50,6 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-//        setTopFragment();
         setBottomNaviMenuListener();
         binding.mainBNVMenu.setSelectedItemId(R.id.menu_FRG_home);
 
@@ -60,8 +60,6 @@ public class MainActivity extends AppCompatActivity {
             loadPetProfile(CurrentUser.getInstance().getUserProfile().getPetsIds().get(0));
         }
 
-        // TODO: remove this
-//        addHardCodedMealsData();
     }
 
     private void setBottomNaviMenuListener() {
@@ -101,8 +99,17 @@ public class MainActivity extends AppCompatActivity {
                 .commit();
     }
 
-    public void replaceToHomeFragment() {
-        binding.mainBNVMenu.setSelectedItemId(R.id.menu_FRG_home);
+    public void selectHomeFragmentOnMenu() {
+        binding.mainBNVMenu.setSelectedItemId(menu_home);
+    }
+    public void selectMealLogFragmentOnMenu() {
+        binding.mainBNVMenu.setSelectedItemId(menu_meals);
+    }
+    public void selectWalkLogFragmentOnMenu() {
+        binding.mainBNVMenu.setSelectedItemId(menu_walks);
+    }
+    public void selectSettingsFragmentOnMenu() {
+        binding.mainBNVMenu.setSelectedItemId(menu_settings);
     }
 
     private void setAddDialog() {
@@ -121,7 +128,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void goToProfileActivity() {
+        Bundle bundle = new Bundle();
+        bundle.putBoolean(Constants.KEY_NEW_USER, false);
+        bundle.putBoolean(Constants.KEY_FROM_MAIN, true);
         Intent intent = new Intent(this, UserProfileActivity.class);
+        intent.putExtras(bundle);
         startActivity(intent);
     }
 
@@ -170,5 +181,15 @@ public class MainActivity extends AppCompatActivity {
             public void onCancelled(@NonNull DatabaseError error) {
             }
         });
+    }
+
+    @Override
+    public void onPetsListChanged() {
+        if(!CurrentUser.getInstance().getUserProfile().hasPets()) {
+            setNoPets();
+        }
+        else {
+            loadPetProfile(CurrentUser.getInstance().getUserProfile().getPetsIds().get(0));
+        }
     }
 }

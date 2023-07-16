@@ -1,9 +1,9 @@
-package com.example.pawsome.current_state;
-
-import android.util.Log;
+package com.example.pawsome.current_state.singletons;
 
 import androidx.annotation.NonNull;
 
+import com.example.pawsome.current_state.observers.PetMealsObserver;
+import com.example.pawsome.current_state.observers.UserProfileObserver;
 import com.example.pawsome.dal.DataCrud;
 import com.example.pawsome.model.UserProfile;
 import com.google.firebase.auth.FirebaseAuth;
@@ -12,17 +12,20 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class CurrentUser {
 
     private static CurrentUser currentUser = null;
     private UserProfile userProfile = null;
-
     private final FirebaseUser user;
+    private List<UserProfileObserver> observers = new ArrayList<>();
 
     private CurrentUser() {
         user = FirebaseAuth.getInstance().getCurrentUser();
         if (user != null) {
-//            loadUserProfile();
+            getUserData(user.getUid());
         }
     }
 
@@ -36,21 +39,39 @@ public class CurrentUser {
         return userProfile;
     }
 
+    public CurrentUser setUserLoggedProfile() {
+        getUserData(user.getUid());
+        return this;
+    }
+
     public CurrentUser setUserProfile(UserProfile userProfile) {
         this.userProfile = userProfile;
         return this;
     }
 
-    private void loadUserProfile() {
-        DataCrud.getInstance().getUserReference(user.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+    private void getUserData(String userId) {
+        DataCrud.getInstance().getUserReference(userId).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
                     userProfile = (snapshot.getValue(UserProfile.class));
-                    setCurrentPet();
+                    getPetListData(userId);
                 }
                 else
                     userProfile = null;
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+            }
+        });
+    }
+
+    private void getPetListData(String userId) {
+        DataCrud.getInstance().getUserReference(userId).child("petsIds").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists())
+                    notifyPetListChanged();
             }
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
@@ -65,13 +86,6 @@ public class CurrentUser {
         return null;
     }
 
-    public void setCurrentPet() {
-        if(userProfile.getPetsIds() == null || userProfile.getPetsIds().isEmpty())
-            return;
-
-        CurrentPet.getInstance().setPetProfileById(userProfile.getPetsIds().get(0));
-    }
-
     public void saveCurrentUserToDB() {
         DataCrud.getInstance().setUserInDB(this.userProfile);
     }
@@ -83,4 +97,19 @@ public class CurrentUser {
                 ", user=" + user +
                 '}';
     }
+
+    public void registerListener(UserProfileObserver observer) {
+        observers.add(observer);
+    }
+
+    public void removeListener(PetMealsObserver observer) {
+        observers.remove(observer);
+    }
+
+    private void notifyPetListChanged() {
+        for (UserProfileObserver observer : observers) {
+            observer.onPetsListChanged();
+        }
+    }
+
 }

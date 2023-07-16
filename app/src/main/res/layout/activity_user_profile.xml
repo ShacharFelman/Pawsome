@@ -32,24 +32,29 @@
             android:paddingEnd="60dp"
             android:scrollbars="vertical">
 
-            <de.hdodenhof.circleimageview.CircleImageView
-                android:id="@+id/profile_IMG_profile"
+            <RelativeLayout
                 android:layout_width="100dp"
                 android:layout_height="100dp"
                 android:layout_centerInParent="true"
-                android:layout_gravity="center_horizontal"
+                android:layout_gravity="center_horizontal">
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/profile_IMG_profile"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:src="@drawable/ic_profile"
                 app:civ_border_color="#80595959"
                 app:civ_border_width="1dp" />
 
-            <com.google.android.material.progressindicator.CircularProgressIndicator
-                android:id="@+id/profile_CPI_upload"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginTop="10dp"
-                android:indeterminate="true"
-                android:visibility="invisible" />
+                <com.google.android.material.progressindicator.CircularProgressIndicator
+                    android:id="@+id/profile_CPI_upload"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:indeterminate="true"
+                    android:visibility="invisible" />
+
+            </RelativeLayout>
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/profile_EDT_name"
@@ -88,18 +93,12 @@
                 android:text="@string/button_save"
                 android:textAllCaps="false" />
 
-            <androidx.appcompat.widget.LinearLayoutCompat
-                android:id="@+id/profile_LAY_next_page_options"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
->
-
                 <androidx.appcompat.widget.LinearLayoutCompat
                     android:id="@+id/profile_LAY_new_pet"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    android:visibility="gone">
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/profile_BTN_add_pet"
@@ -122,9 +121,6 @@
                         android:text="@string/prompt_exists_pet_note" />
 
                 </androidx.appcompat.widget.LinearLayoutCompat>
-
-
-            </androidx.appcompat.widget.LinearLayoutCompat>
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/profile_BTN_home"

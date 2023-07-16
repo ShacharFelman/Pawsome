@@ -114,19 +114,6 @@
 
         </androidx.appcompat.widget.LinearLayoutCompat>
 
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/pet_meal_EDT_type"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/hint_food_type">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-        </com.google.android.material.textfield.TextInputLayout>
-
         <androidx.appcompat.widget.LinearLayoutCompat
             android:layout_width="match_parent"
             android:layout_height="match_parent"

@@ -23,7 +23,7 @@ import com.example.pawsome.R;
 import com.example.pawsome.adapters.MealTypeAdapter;
 import com.example.pawsome.adapters.OwnersAdapter;
 import com.example.pawsome.dal.DataCrud;
-import com.example.pawsome.current_state.CurrentUser;
+import com.example.pawsome.current_state.singletons.CurrentUser;
 import com.example.pawsome.dal.FilesCrud;
 import com.example.pawsome.dal.FirebaseDB;
 import com.example.pawsome.databinding.ActivityPetProfileBinding;
@@ -34,6 +34,7 @@ import com.example.pawsome.utils.Constants;
 import com.example.pawsome.utils.DateTimeConverter;
 import com.example.pawsome.utils.SignalUtils;
 import com.google.android.material.datepicker.MaterialDatePicker;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.timepicker.MaterialTimePicker;
 import com.google.android.material.timepicker.TimeFormat;
 import com.google.firebase.auth.FirebaseAuth;
@@ -76,16 +77,13 @@ public class PetProfileActivity extends AppCompatActivity {
 
         isNewPet = getIntent().getBooleanExtra(Constants.KEY_NEW_PET, true);
         isFromActivityMain = getIntent().getBooleanExtra(Constants.KEY_FROM_MAIN, true);
-        Log.d("aaa", "onCreate: isNewPet: " + isNewPet);
-        if(!isNewPet) {
+        if (!isNewPet) {
             petId = getIntent().getStringExtra(Constants.KEY_PET_ID);
-            Log.d("aaa", "onCreate: petId: " + petId);
             if (petId == null || petId.isEmpty())
                 errorGetPetData();
 
             loadPetData();
-        }
-        else
+        } else
             initPetProfile();
 
         initView();
@@ -104,7 +102,7 @@ public class PetProfileActivity extends AppCompatActivity {
         initPetView();
         initAddMealTypeView();
         initImagePickerLauncher();
-        if(isNewPet)
+        if (isNewPet)
             initMealTypesListView();
     }
 
@@ -122,6 +120,58 @@ public class PetProfileActivity extends AppCompatActivity {
     private void initMealTypesListCallbacks() {
         mealTypeAdapter.setGroupCallback((mealType, position) -> petProfile.removeMealType(mealType));
     }
+
+    private void initOwnersListCallbacks() {
+        ownersAdapter.setOwnerCallback((user, position) -> deleteOwnerPressed(user));
+    }
+
+    private void deleteOwnerPressed(UserProfile user) {
+        String alertMsg;
+
+        MaterialAlertDialogBuilder alertDialogBuilder = new MaterialAlertDialogBuilder(this);
+        alertDialogBuilder.setTitle("Remove Owner");
+        alertDialogBuilder.setIcon(android.R.drawable.ic_menu_delete);
+
+        if (user.getUid().equals(CurrentUser.getInstance().getUid())) {
+            if (petProfile.isOnlyOneOwner())
+                alertMsg = "You are the only owner of this pet. If you remove yourself, the pet will be deleted and it's data. Are you sure you want to remove yourself?";
+            else
+                alertMsg = "You are deleting yourself from this pet, you will no longer be able to see it's data. Are you sure?";
+
+            alertDialogBuilder.setMessage(alertMsg);
+            alertDialogBuilder.setPositiveButton("Delete", (dialog, which) -> deletePetFromCurrentUser(user));
+            alertDialogBuilder.setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss());
+            alertDialogBuilder.show();
+        } else {
+            alertDialogBuilder.setMessage("You are deleting " + user.getName() + " from this pet, he/she will no longer be able to see it's data. Are you sure?");
+            alertDialogBuilder.setPositiveButton("Remove", (dialog, which) -> deletePetFromOtherUser(user));
+            alertDialogBuilder.setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss());
+            alertDialogBuilder.show();
+        }
+
+    }
+
+
+    private void deletePetFromCurrentUser(UserProfile user) {
+        petProfile.removeOwner(user.getUid());
+        DataCrud.getInstance().setPetInDB(petProfile);
+        DataCrud.getInstance().deletePetFromDB(user.getUid());
+        CurrentUser.getInstance().getUserProfile().removePet(user.getUid());
+        DataCrud.getInstance().setUserInDB(CurrentUser.getInstance().getUserProfile());
+
+        owners.remove(user);
+        ownersAdapter.notifyDataSetChanged();
+    }
+
+    private void deletePetFromOtherUser(UserProfile user) {
+        petProfile.removeOwner(user.getUid());
+        DataCrud.getInstance().setPetInDB(petProfile);
+        DataCrud.getInstance().deletePetFromUser(user.getUid(), petProfile.getId());
+
+        owners.remove(user);
+        ownersAdapter.notifyDataSetChanged();
+    }
+
 
     private void setPetButtonsListener() {
         binding.petIMGProfile.setOnClickListener(v -> checkPermissionAndUploadImage());
@@ -181,22 +231,6 @@ public class PetProfileActivity extends AppCompatActivity {
             public void onTextChanged(CharSequence unit, int start, int before, int count) {
                 if (!binding.petCVAddMealType.petMealEDTUnit.getEditText().getText().toString().isEmpty())
                     binding.petCVAddMealType.petMealEDTUnit.setError(null);
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-            }
-        });
-
-        binding.petCVAddMealType.petMealEDTType.getEditText().addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence type, int start, int before, int count) {
-                if (!binding.petCVAddMealType.petMealEDTType.getEditText().getText().toString().isEmpty())
-                    binding.petCVAddMealType.petMealEDTType.setError(null);
             }
 
             @Override
@@ -281,6 +315,7 @@ public class PetProfileActivity extends AppCompatActivity {
         ownersAdapter = new OwnersAdapter(this, owners);
         binding.petLSTOwners.setLayoutManager(new LinearLayoutManager(this));
         binding.petLSTOwners.setAdapter(ownersAdapter);
+        initOwnersListCallbacks();
     }
 
     private void initImagePickerLauncher() {
@@ -300,13 +335,11 @@ public class PetProfileActivity extends AppCompatActivity {
         binding.petCVAddMealType.petMealEDTName.getEditText().setText("");
         binding.petCVAddMealType.petMealEDTAmount.getEditText().setText("");
         binding.petCVAddMealType.petMealEDTUnit.getEditText().setText("");
-        binding.petCVAddMealType.petMealEDTType.getEditText().setText("");
         binding.petCVAddMealType.petMealEDTTime.getEditText().setText("");
 
         binding.petCVAddMealType.petMealEDTName.setError(null);
         binding.petCVAddMealType.petMealEDTAmount.setError(null);
         binding.petCVAddMealType.petMealEDTUnit.setError(null);
-        binding.petCVAddMealType.petMealEDTType.setError(null);
         binding.petCVAddMealType.petMealEDTTime.setError(null);
     }
 
@@ -329,7 +362,6 @@ public class PetProfileActivity extends AppCompatActivity {
         mealType.setName(binding.petCVAddMealType.petMealEDTName.getEditText().getText().toString());
         mealType.setAmount(Integer.parseInt(binding.petCVAddMealType.petMealEDTAmount.getEditText().getText().toString()));
         mealType.setUnit(binding.petCVAddMealType.petMealEDTUnit.getEditText().getText().toString());
-        mealType.setFoodType(binding.petCVAddMealType.petMealEDTType.getEditText().getText().toString());
         mealType.setTimeFromString(binding.petCVAddMealType.petMealEDTTime.getEditText().getText().toString());
 
         if (petProfile.addMealType(mealType)) {
@@ -357,10 +389,7 @@ public class PetProfileActivity extends AppCompatActivity {
             binding.petCVAddMealType.petMealEDTAmount.setError("Unit is required!");
             return false;
         }
-        if (binding.petCVAddMealType.petMealEDTType.getEditText().getText().toString().isEmpty()) {
-            binding.petCVAddMealType.petMealEDTType.setError("Type is required!");
-            return false;
-        }
+
         return true;
     }
 
@@ -436,7 +465,7 @@ public class PetProfileActivity extends AppCompatActivity {
         addOwnerToPet(CurrentUser.getInstance().getUserProfile());
         DataCrud.getInstance().setPetInDB(petProfile);
 
-        if(isFromActivityMain)
+        if (isFromActivityMain)
             finish();
         else
             goToMainActivity();
@@ -496,7 +525,7 @@ public class PetProfileActivity extends AppCompatActivity {
     private void setPetDataInView() {
         binding.petEDTName.getEditText().setText(petProfile.getName());
         binding.petSPGender.setSelection(getGender(petProfile.getGender()));
-        binding.petEDTDateOfBirth.getEditText().setText(DateTimeConverter.longToString(petProfile.getDateOfBirth()));
+        binding.petEDTDateOfBirth.getEditText().setText(DateTimeConverter.longToStringDate(petProfile.getDateOfBirth()));
 
         Glide
                 .with(this).
@@ -548,15 +577,19 @@ public class PetProfileActivity extends AppCompatActivity {
     private void ownersListPressed() {
         if (binding.petLSTOwners.getVisibility() == View.VISIBLE)
             hideOwnersList();
-        else
+        else {
+            hideAddOwner();
             showOwnersList();
+        }
     }
 
     private void addOwnerPressed() {
         if (binding.petLAYAddOwner.getVisibility() == View.VISIBLE)
             hideAddOwner();
-        else
+        else {
+            hideOwnersList();
             showAddOwner();
+        }
     }
 
     private void hideOwnersList() {
@@ -586,6 +619,11 @@ public class PetProfileActivity extends AppCompatActivity {
             return;
         }
 
+        if (emailToSearch.equals(CurrentUser.getInstance().getUserProfile().getEmail())) {
+            binding.petEDTOwnerEmail.setError("You already own this pet");
+            return;
+        }
+
         binding.petBTNSearchOwner.setEnabled(false);
         binding.petCPISeaching.setVisibility(View.VISIBLE);
 
@@ -600,7 +638,11 @@ public class PetProfileActivity extends AppCompatActivity {
                     UserProfile user = userSnapshot.getValue(UserProfile.class);
                     binding.petBTNSearchOwner.setEnabled(true);
                     binding.petCPISeaching.setVisibility(View.INVISIBLE);
-                    addOwnerToPet(user);
+
+                    if (petProfile.isContainsOwner(user.getUid()))
+                        SignalUtils.getInstance().toast("Owner already added");
+                    else
+                        addOwnerToPet(user);
                 }
                 if (!isFound)
                     errorGetOwnerByEmail();
@@ -625,9 +667,15 @@ public class PetProfileActivity extends AppCompatActivity {
             isOwnerAdded = true;
         }
 
-        DataCrud.getInstance().setUserInDB(user);
+        if (!petProfile.getOwnersIds().contains(user.getUid())) {
+            petProfile.addOwner(user.getUid());
+            isOwnerAdded = true;
+        }
 
-        if(isOwnerAdded)
+        DataCrud.getInstance().setUserInDB(user);
+        DataCrud.getInstance().setPetInDB(petProfile);
+
+        if (isOwnerAdded)
             SignalUtils.getInstance().toast("Owner added successfully");
     }
 
@@ -667,7 +715,6 @@ public class PetProfileActivity extends AppCompatActivity {
                         imageUrl = task.getResult().toString();
                         isImageUploaded = true;
                     });
-                    binding.petIMGProfile.setImageURI(null);
                     setImageUploadingView(false);
                     Toast.makeText(PetProfileActivity.this, "Image Uploaded", Toast.LENGTH_SHORT).show();
                 }).addOnFailureListener(e -> {

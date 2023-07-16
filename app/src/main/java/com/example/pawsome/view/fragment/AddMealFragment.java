@@ -5,18 +5,21 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 
-import com.example.pawsome.current_state.CurrentPet;
+import com.example.pawsome.current_state.singletons.CurrentPet;
+import com.example.pawsome.current_state.singletons.CurrentUser;
 import com.example.pawsome.dal.DataCrud;
 import com.example.pawsome.databinding.FragmentAddMealBinding;
 import com.example.pawsome.model.Meal;
 import com.example.pawsome.model.MealType;
 import com.example.pawsome.model.UserProfile;
 import com.example.pawsome.utils.Constants;
+import com.example.pawsome.utils.DateTimeConverter;
 import com.example.pawsome.view.activity.MainActivity;
 import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.timepicker.MaterialTimePicker;
@@ -33,14 +36,16 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class AddMealFragment extends Fragment {
 
     private FragmentAddMealBinding binding;
-    private List<MealType> mealTypes;
+    private List<String> mealTypes;
     private MealType selectedMealType;
     private List<UserProfile> owners;
     private UserProfile selectedOwner;
+    private String note;
 
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -58,6 +63,7 @@ public class AddMealFragment extends Fragment {
         getMealsTypesList();
         initMealTypesSpinner();
         setMealTypeDataInView();
+        setCurrentDateTimeSelected();
 
         getOwnersList();
 
@@ -66,7 +72,8 @@ public class AddMealFragment extends Fragment {
 
     private void initListeners() {
         binding.addMealACTVMealType.setOnItemClickListener((parent, view, position, id) -> {
-            this.selectedMealType = (MealType) parent.getItemAtPosition(position);
+            this.selectedMealType = getSelectedMealType();
+            setMealTypeDataInView();
         });
 
         binding.addMealACTVOwner.setOnItemClickListener((parent, view, position, id) -> {
@@ -79,13 +86,57 @@ public class AddMealFragment extends Fragment {
 
         binding.addMealBTNTime.setOnClickListener(v -> setTime());
         binding.addMealBTNDate.setOnClickListener(v -> setDate());
+        binding.addMealBTNAddNote.setOnClickListener(v -> showAddNote());
+        binding.addMealCVNote.noteBTNCancel.setOnClickListener(v -> hideAddNote());
+        binding.addMealCVNote.noteBTNSave.setOnClickListener(v -> saveNoteText());
+    }
+
+
+
+    private void showAddNote() {
+        binding.addMealCVNote.getRoot().setVisibility(View.VISIBLE);
+        disableMealFields();
+    }
+
+    private void hideAddNote() {
+        binding.addMealCVNote.getRoot().setVisibility(View.GONE);
+        enableMealFields();
+    }
+
+    private void saveNoteText() {
+        note = binding.addMealCVNote.noteEDTNote.getEditText().getText().toString();
+        hideAddNote();
+    }
+
+    private void disableMealFields() {
+        binding.addMealTILMealType.setEnabled(false);
+        binding.addMealBTNDate.setEnabled(false);
+        binding.addMealBTNTime.setEnabled(false);
+        binding.addMealEDTName.setEnabled(false);
+        binding.addMealEDTAmount.setEnabled(false);
+        binding.addMealEDTUnit.setEnabled(false);
+        binding.addMealTILOwner.setEnabled(false);
+        binding.addMealBTNAddNote.setEnabled(false);
+        binding.addMealBTNSave.setEnabled(false);
+    }
+
+    private void enableMealFields() {
+        binding.addMealTILMealType.setEnabled(true);
+        binding.addMealBTNDate.setEnabled(true);
+        binding.addMealBTNTime.setEnabled(true);
+        binding.addMealEDTName.setEnabled(true);
+        binding.addMealEDTAmount.setEnabled(true);
+        binding.addMealEDTUnit.setEnabled(true);
+        binding.addMealTILOwner.setEnabled(true);
+        binding.addMealBTNAddNote.setEnabled(true);
+        binding.addMealBTNSave.setEnabled(true);
     }
 
     private void initMealTypesSpinner() {
         if (this.mealTypes == null || this.mealTypes.isEmpty())
             binding.addMealTILMealType.setVisibility(View.GONE);
         else {
-            ArrayAdapter<MealType> adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_dropdown_item_1line, mealTypes);
+            ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_dropdown_item_1line, mealTypes);
             binding.addMealACTVMealType.setAdapter(adapter);
         }
     }
@@ -94,9 +145,17 @@ public class AddMealFragment extends Fragment {
         if (this.owners == null || this.owners.isEmpty())
             binding.addMealTILMealType.setVisibility(View.INVISIBLE);
         else {
+            for (UserProfile owner : owners) {
+                if(owner.getUid().equals(CurrentUser.getInstance().getUid()))
+                    selectedOwner = owner;
+            }
+            if (selectedOwner == null)
+                selectedOwner = owners.get(0);
+
             ArrayAdapter<UserProfile> adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_dropdown_item_1line, owners);
             binding.addMealACTVOwner.setAdapter(adapter);
             binding.addMealTILOwner.setVisibility(View.VISIBLE);
+            binding.addMealACTVOwner.setText(selectedOwner.getName(), false);
         }
     }
 
@@ -129,14 +188,24 @@ public class AddMealFragment extends Fragment {
         });
     }
 
-//    private MealType getMealTypeSelected() {
-//        String mealTypeName = binding.addMealACTVMealType.getText().toString();
-//        for (MealType mealType : mealTypes) {
-//            if (mealType.getName().equals(mealTypeName))
-//                return mealType;
-//        }
-//        return null;
-//    }
+    private MealType getSelectedMealType() {
+        String selectedMealTypeName = binding.addMealACTVMealType.getText().toString();
+        for (MealType mealType : CurrentPet.getInstance().getPetProfile().getMealTypes()) {
+            if (mealType.getName().equals(selectedMealTypeName))
+                return mealType;
+        }
+        return null;
+    }
+
+    private UserProfile getSelectedOwner() {
+        String selectedOwnerName = binding.addMealACTVOwner.getText().toString();
+        for (UserProfile owner : owners) {
+            if (owner.getName().equals(selectedOwnerName))
+                return owner;
+        }
+
+        return null;
+    }
 
     private void setMealTypeDataInView() {
         if (this.selectedMealType != null) {
@@ -148,18 +217,19 @@ public class AddMealFragment extends Fragment {
 
             if (selectedMealType.getUnit() != null && !selectedMealType.getUnit().isEmpty())
                 binding.addMealEDTUnit.getEditText().setText(selectedMealType.getUnit());
-
-            if (selectedMealType.getFoodType() != null && !selectedMealType.getFoodType().isEmpty())
-                binding.addMealEDTFoodType.getEditText().setText(selectedMealType.getFoodType());
         }
 
+    }
+
+    private void setCurrentDateTimeSelected() {
         binding.addMealEDTTime.getEditText().setText(LocalTime.now().format(DateTimeFormatter.ofPattern(Constants.FORMAT_TIME)));
         binding.addMealEDTDate.getEditText().setText(LocalDate.now().format(DateTimeFormatter.ofPattern(Constants.FORMAT_DATE)));
     }
-
     private void getMealsTypesList() {
         if (CurrentPet.getInstance().getPetProfile() != null)
-            this.mealTypes = CurrentPet.getInstance().getPetProfile().getMealTypes();
+            this.mealTypes = CurrentPet.getInstance().getPetProfile().getMealTypes().stream().map(MealType::getName).collect(Collectors.toList());
+
+        this.mealTypes.add(Constants.MEAL_TYPE_OTHER);
     }
 
     private void getOwnersList() {
@@ -199,19 +269,18 @@ public class AddMealFragment extends Fragment {
             LocalDateTime dateTime = LocalDateTime.parse(date + " " + time, DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"));
 
             meal
-//                    .setPetId(CurrentPet.getInstance().getPetProfile().getId())
                     .setName(binding.addMealEDTName.getEditText().getText().toString())
                     .setAmount(Integer.parseInt(binding.addMealEDTAmount.getEditText().getText().toString()))
                     .setUnit(binding.addMealEDTUnit.getEditText().getText().toString())
-//                    .setNote(binding.addMealEDTNote.getEditText().getText().toString())
-                    .setFoodType(binding.addMealEDTFoodType.getEditText().getText().toString())
-                    .setDateTimeAsLocalDateTime(dateTime);
+                    .setNote(note)
+                    .setDateTime(DateTimeConverter.localDateTimeToLong(dateTime))
+                    .setOwner(getSelectedOwner());
 
 
             CurrentPet.getInstance().getPetProfile().addMeal(meal);
             DataCrud.getInstance().setPetInDB(CurrentPet.getInstance().getPetProfile());
 
-            ((MainActivity) getActivity()).replaceToHomeFragment();
+            ((MainActivity) getActivity()).selectMealLogFragmentOnMenu();
         }
     }
 

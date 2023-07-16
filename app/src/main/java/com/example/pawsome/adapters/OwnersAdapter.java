@@ -1,7 +1,6 @@
 package com.example.pawsome.adapters;
 
 
-import android.app.Activity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,11 +8,12 @@ import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.pawsome.R;
+import com.example.pawsome.callbacks.OwnerCallback;
+import com.example.pawsome.current_state.singletons.CurrentUser;
 import com.example.pawsome.model.UserProfile;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textview.MaterialTextView;
@@ -27,7 +27,7 @@ public class OwnersAdapter extends RecyclerView.Adapter<OwnersAdapter.OwnerViewH
     private final AppCompatActivity activity;
     private List<UserProfile> owners;
 
-//    private MealCallback mealCallback;
+    private OwnerCallback ownerCallback;
 
 
     public OwnersAdapter(AppCompatActivity activity, List<UserProfile> owners) {
@@ -35,10 +35,10 @@ public class OwnersAdapter extends RecyclerView.Adapter<OwnersAdapter.OwnerViewH
         this.activity = activity;
     }
 
-//    public PetsAdapter setMealCallback(MealCallback mealCallback) {
-//        this.mealCallback = mealCallback;
-//        return this;
-//    }
+    public OwnersAdapter setOwnerCallback(OwnerCallback ownerCallback) {
+        this.ownerCallback = ownerCallback;
+        return this;
+    }
 
     @NonNull
     @Override
@@ -51,7 +51,13 @@ public class OwnersAdapter extends RecyclerView.Adapter<OwnersAdapter.OwnerViewH
     @Override
     public void onBindViewHolder(@NonNull OwnerViewHolder holder, int position) {
         UserProfile owner = getItem(position);
-        holder.owner_TV_name.setText(owner.getName());
+
+        String ownerName = owner.getName();
+        if(ownerName.equals(CurrentUser.getInstance().getUserProfile().getName()))
+           ownerName += " (You)";
+
+
+        holder.owner_TV_name.setText(ownerName);
         Glide.
                 with(activity).
                 load(owner.getProfileImage()).
@@ -78,12 +84,6 @@ public class OwnersAdapter extends RecyclerView.Adapter<OwnersAdapter.OwnerViewH
         notifyDataSetChanged();
     }
 
-//    public void deleteMeal(String mealId) {
-//        if (mealsList.containsKey(mealId))
-//            mealsList.remove(mealId);
-//        notifyDataSetChanged();
-//    }
-
     public List<UserProfile> getOwners() {
         return owners;
     }
@@ -96,7 +96,7 @@ public class OwnersAdapter extends RecyclerView.Adapter<OwnersAdapter.OwnerViewH
         public OwnerViewHolder(@NonNull View itemView) {
             super(itemView);
             initViews();
-//            itemView.setOnClickListener(view -> mealCallback.itemClicked(getItem(getAdapterPosition()), getAdapterPosition()));
+            owner_BTN_delete.setOnClickListener(view -> ownerCallback.deleteClicked(getItem(getAdapterPosition()), getAdapterPosition()));
         }
 
         private void initViews() {

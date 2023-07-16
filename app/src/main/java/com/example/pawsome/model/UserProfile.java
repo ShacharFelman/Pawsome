@@ -99,8 +99,15 @@ public class UserProfile {
         return !petsIds.isEmpty();
     }
 
+    public UserProfile removePet(String id) {
+        this.petsIds.remove(id);
+        return this;
+    }
+
     @Override
     public String toString() {
         return this.name;
     }
+
+
 }

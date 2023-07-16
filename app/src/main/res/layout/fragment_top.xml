@@ -7,6 +7,13 @@
     tools:context=".view.fragment.TopFragment"
     android:background="@drawable/bck_primary_gradient">
 
+    <androidx.appcompat.widget.AppCompatImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@drawable/background_top_fragment"
+        android:scaleType="centerCrop"
+        android:alpha="0.2" />
+
     <androidx.appcompat.widget.AppCompatImageButton
         android:id="@+id/top_BTN_logout"
         android:layout_width="wrap_content"
@@ -29,16 +36,15 @@
         android:textStyle="bold"
         android:textColor="@color/white"/>
 
-    <de.hdodenhof.circleimageview.CircleImageView
-        android:id="@+id/top_IMG_profile"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/top_LST_pets"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
         android:layout_below="@id/top_TV_title"
-        android:layout_centerInParent="true"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginVertical="10dp"
-        android:src="@drawable/ic_profile"
-        app:civ_border_color="#80595959"
-        app:civ_border_width="1dp" />
+        android:paddingHorizontal="5dp"
+        android:orientation="horizontal"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        tools:listitem="@layout/item_current_pet" />
 
 </RelativeLayout>

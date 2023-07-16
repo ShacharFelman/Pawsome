@@ -9,11 +9,9 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.example.pawsome.R;
-import com.example.pawsome.current_state.CurrentPet;
 import com.example.pawsome.dal.DataCrud;
 import com.example.pawsome.dal.FirebaseDB;
-import com.example.pawsome.current_state.CurrentUser;
-import com.example.pawsome.model.PetProfile;
+import com.example.pawsome.current_state.singletons.CurrentUser;
 import com.example.pawsome.model.UserProfile;
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract;
@@ -23,9 +21,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.ValueEventListener;
 
 import java.util.Collections;
 import java.util.List;
@@ -75,12 +71,10 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void login() {
-        // Choose authentication providers
         List<AuthUI.IdpConfig> providers = Collections.singletonList(
                 new AuthUI.IdpConfig.EmailBuilder().build()
         );
 
-        // Create and launch sign-in intent
         Intent signInIntent = AuthUI.getInstance()
                 .createSignInIntentBuilder()
                 .setAvailableProviders(providers)
@@ -103,59 +97,12 @@ public class LoginActivity extends AppCompatActivity {
                         createUser();
                     if (!CurrentUser.getInstance().getUserProfile().getRegistered())
                         goToProfileActivity();
-//                else if(CurrentUser.getInstance().getUserProfile().getPetsIds() != null && CurrentUser.getInstance().getUserProfile().getPetsIds().isEmpty()) {
-//                    loadPetProfile(CurrentUser.getInstance().getUserProfile().getPetsIds().get(0));
-////                    goToMainActivity();
-//                }
                     else
                         goToMainActivity();
                 }
             }
         });
-
-
-//        DataCrud.getInstance().getUserReference(firebaseUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot snapshot) {
-//                if (snapshot.exists())
-//                    CurrentUser.getInstance().setUserProfile(snapshot.getValue(UserProfile.class));
-//                else
-//                    createUser();
-//
-//                if (!CurrentUser.getInstance().getUserProfile().getRegistered())
-//                    goToProfileActivity();
-////                else if(CurrentUser.getInstance().getUserProfile().getPetsIds() != null && CurrentUser.getInstance().getUserProfile().getPetsIds().isEmpty()) {
-////                    loadPetProfile(CurrentUser.getInstance().getUserProfile().getPetsIds().get(0));
-//////                    goToMainActivity();
-////                }
-//                else
-//                    goToMainActivity();
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError error) {
-//
-//            }
-//        });
     }
-
-//    private void loadPetProfile(String petId) {
-//        DataCrud.getInstance().getPetReference(petId).addListenerForSingleValueEvent(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot snapshot) {
-//                if (snapshot.exists()) {
-//                    CurrentPet.getInstance().setPetProfile(snapshot.getValue(PetProfile.class));
-//                    goToMainActivity();
-//                }
-//                else {
-////                    petProfile = null;
-//                }
-//            }
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError error) {
-//            }
-//        });
-//    }
 
     private void createUser() {
         UserProfile userProfile = new UserProfile(firebaseUser.getDisplayName(), firebaseUser.getUid(), firebaseUser.getEmail());

@@ -1,22 +1,19 @@
 package com.example.pawsome.view.fragment;
 
-import android.content.DialogInterface;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
-import android.provider.ContactsContract;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.bumptech.glide.Glide;
-import com.example.pawsome.adapters.PetsAdapter;
-import com.example.pawsome.callbacks.PetCallback;
-import com.example.pawsome.current_state.CurrentPet;
-import com.example.pawsome.current_state.CurrentUser;
+import com.example.pawsome.adapters.PetsListAdapter;
+import com.example.pawsome.callbacks.PetListCallback;
+import com.example.pawsome.current_state.singletons.CurrentUser;
 import com.example.pawsome.dal.DataCrud;
 import com.example.pawsome.databinding.FragmentSettingsBinding;
 import com.example.pawsome.model.PetProfile;
@@ -33,7 +30,7 @@ import java.util.List;
 public class SettingsFragment extends Fragment {
 
     private FragmentSettingsBinding binding;
-    private PetsAdapter petsAdapter;
+    private PetsListAdapter petsListAdapter;
     private List<PetProfile> pets = new ArrayList<>();
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -41,12 +38,16 @@ public class SettingsFragment extends Fragment {
         binding = FragmentSettingsBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
+        return root;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
         initButtonsListeners();
         setUserImageView();
         setUserNameView();
         getPetsData();
-
-        return root;
     }
 
     private void initButtonsListeners() {
@@ -66,7 +67,7 @@ public class SettingsFragment extends Fragment {
     }
 
     private void setPetsListCallbacks() {
-        petsAdapter.setPetCallback(new PetCallback() {
+        petsListAdapter.setPetCallback(new PetListCallback() {
             @Override
             public void deleteClicked(PetProfile pet, int position) {
                 deletePetPressed(pet);
@@ -81,6 +82,7 @@ public class SettingsFragment extends Fragment {
 
     private void getPetsData() {
         if (CurrentUser.getInstance().getUserProfile().hasPets()) {
+            pets.clear();
             binding.settingsCPIPetsLoading.setVisibility(View.VISIBLE);
             for (String petId : CurrentUser.getInstance().getUserProfile().getPetsIds()) {
                 DataCrud.getInstance().getPetReference(petId).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -117,9 +119,9 @@ public class SettingsFragment extends Fragment {
 
 
     private void setPetsListView() {
-        petsAdapter = new PetsAdapter(this, pets);
+        petsListAdapter = new PetsListAdapter(this, pets);
         binding.settingsLSTPets.setLayoutManager(new LinearLayoutManager(getContext()));
-        binding.settingsLSTPets.setAdapter(petsAdapter);
+        binding.settingsLSTPets.setAdapter(petsListAdapter);
         setPetsListCallbacks();
     }
 
@@ -129,6 +131,9 @@ public class SettingsFragment extends Fragment {
 
         CurrentUser.getInstance().getUserProfile().deletePet(pet.getId());
         CurrentUser.getInstance().saveCurrentUserToDB();
+
+        pets.remove(pet);
+        petsListAdapter.notifyDataSetChanged();
     }
 
     private void goToProfileActivity() {

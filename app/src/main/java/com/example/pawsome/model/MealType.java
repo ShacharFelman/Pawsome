@@ -11,18 +11,9 @@ public class MealType {
     private long time;
     private int amount;
     private String unit;
-    private String foodType;
     private String name;
 
     public MealType() {
-    }
-
-    public MealType(long time, int amount, String unit, String foodType, String name) {
-        this.time = time;
-        this.amount = amount;
-        this.unit = unit;
-        this.foodType = foodType;
-        this.name = name;
     }
 
     public long getTime() {
@@ -49,15 +40,6 @@ public class MealType {
 
     public MealType setUnit(String unit) {
         this.unit = unit;
-        return this;
-    }
-
-    public String getFoodType() {
-        return foodType;
-    }
-
-    public MealType setFoodType(String foodType) {
-        this.foodType = foodType;
         return this;
     }
 

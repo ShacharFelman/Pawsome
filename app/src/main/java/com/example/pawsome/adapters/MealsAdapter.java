@@ -1,6 +1,7 @@
 package com.example.pawsome.adapters;
 
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,14 +14,13 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.pawsome.callbacks.MealCallback;
 import com.example.pawsome.R;
-import com.example.pawsome.current_state.CurrentUser;
+import com.example.pawsome.current_state.singletons.CurrentUser;
 import com.example.pawsome.model.Meal;
-import com.example.pawsome.utils.Constants;
+import com.example.pawsome.utils.DateTimeConverter;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.textview.MaterialTextView;
 
-import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.List;
 
@@ -29,9 +29,7 @@ public class MealsAdapter extends RecyclerView.Adapter<MealsAdapter.MealViewHold
     private final Fragment fragment;
     private List<Meal> mealsList;
 
-
     private MealCallback mealCallback;
-
 
     public MealsAdapter(Fragment fragment, List<Meal> mealsList) {
         this.mealsList = mealsList;
@@ -55,19 +53,19 @@ public class MealsAdapter extends RecyclerView.Adapter<MealsAdapter.MealViewHold
     public void onBindViewHolder(@NonNull MealViewHolder holder, int position) {
         Meal meal = getItem(position);
         holder.meal_TV_user.setText(meal.getOwner().getName());
-        holder.meal_TV_time.setText(meal.getDateTimeAsLocalDateTime().format(DateTimeFormatter.ofPattern(Constants.FORMAT_TIME)));
-        holder.meal_TV_date.setText(meal.getDateTimeAsLocalDateTime().format(DateTimeFormatter.ofPattern(Constants.FORMAT_DATE)));
+        holder.meal_TV_time.setText(DateTimeConverter.longToStringTime(meal.getDateTime()));
+        holder.meal_TV_date.setText(DateTimeConverter.longToStringDate(meal.getDateTime()));
         holder.meal_TV_note.setText(meal.getNote());
-        holder.meal_TV_type.setText(meal.getMealType().getName());
+        holder.meal_TV_type.setText(meal.getName());
         Glide.
                 with(fragment.getContext()).
                 load(meal.getOwner().getProfileImage()).
                 into(holder.meal_IMG_user);
 
         if(meal.getOwner().getUid().equals(CurrentUser.getInstance().getUid()))
-            holder.meal_CV_item.setStrokeWidth(0);
+            holder.meal_CV_item.setStrokeWidth(5);
         else
-            holder.meal_CV_item.setStrokeWidth(2);
+            holder.meal_CV_item.setStrokeWidth(0);
     }
 
     private Meal getItem(int position) {
@@ -83,12 +81,6 @@ public class MealsAdapter extends RecyclerView.Adapter<MealsAdapter.MealViewHold
         this.mealsList = mealsList;
         notifyDataSetChanged();
     }
-
-//    public void deleteMeal(String mealId) {
-//        if (mealsList.containsKey(mealId))
-//            mealsList.remove(mealId);
-//        notifyDataSetChanged();
-//    }
 
     public List<Meal> getMealsList() {
         mealsList.sort(Comparator.comparing(Meal::getDateTime).reversed());
@@ -108,7 +100,8 @@ public class MealsAdapter extends RecyclerView.Adapter<MealsAdapter.MealViewHold
         public MealViewHolder(@NonNull View itemView) {
             super(itemView);
             initViews();
-            itemView.setOnClickListener(view -> mealCallback.itemClicked(getItem(getAdapterPosition()), getAdapterPosition()));
+            meal_BTN_delete.setOnClickListener(view -> mealCallback.deleteClicked(getItem(getAdapterPosition()), getAdapterPosition()));
+//            itemView.setOnClickListener(view -> mealCallback.itemClicked(getItem(getAdapterPosition()), getAdapterPosition()));
         }
 
         private void initViews() {

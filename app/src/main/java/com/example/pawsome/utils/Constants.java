@@ -13,4 +13,6 @@ public class Constants {
     public final static String KEY_PET_ID = "petId";
     public final static String KEY_NEW_PET = "NewPet";
     public static final String KEY_FROM_MAIN = "FromActivityMain";
+    public static final String KEY_NEW_USER = "NewPet";
+    public static final String MEAL_TYPE_OTHER = "Other";
 }

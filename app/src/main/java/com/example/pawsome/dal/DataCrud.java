@@ -1,8 +1,15 @@
 package com.example.pawsome.dal;
 
+import android.util.Log;
+
+import androidx.annotation.NonNull;
+
 import com.example.pawsome.model.PetProfile;
 import com.example.pawsome.model.UserProfile;
 import com.example.pawsome.utils.Constants;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 
 public class DataCrud {
@@ -42,5 +49,27 @@ public class DataCrud {
     public void deletePetFromDB(String petId) {
         petsDatabaseReference.child(petId).removeValue();
     }
+
+    public void deletePetFromUser(String petId, String userId) {
+        usersDatabaseReference.child(userId).child("petsIds").child(petId).removeValue();
+
+        DataCrud.getInstance().getUserReference(userId).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DataSnapshot> task) {
+                if (!task.isSuccessful()) {
+                    Log.e("firebase", "Error getting data", task.getException());
+                } else {
+                    if (task.getResult().getValue() != null)
+                        _deletePetFromUser(petId, task.getResult().getValue(UserProfile.class));
+                }
+            }
+        });
+    }
+
+    private void _deletePetFromUser(String petId, UserProfile user) {
+        user.removePet(petId);
+        DataCrud.getInstance().setUserInDB(user);
+    }
+
 
 }

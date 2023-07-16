@@ -1,66 +1,111 @@
 package com.example.pawsome.view.fragment;
 
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.pawsome.R;
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link WalkLogFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
-public class WalkLogFragment extends Fragment {
+import com.example.pawsome.adapters.WalksAdapter;
+import com.example.pawsome.callbacks.WalkCallback;
+import com.example.pawsome.current_state.observers.PetWalksObserver;
+import com.example.pawsome.current_state.singletons.CurrentPet;
+import com.example.pawsome.dal.DataCrud;
+import com.example.pawsome.databinding.FragmentWalkLogBinding;
+import com.example.pawsome.model.Meal;
+import com.example.pawsome.model.Walk;
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+import java.util.Comparator;
+import java.util.List;
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+public class WalkLogFragment extends Fragment implements PetWalksObserver {
+    private FragmentWalkLogBinding binding;
+    private WalksAdapter walksAdapter;
+    private List<Walk> walks;
 
-    public WalkLogFragment() {
-        // Required empty public constructor
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             ViewGroup container, Bundle savedInstanceState) {
+        binding = FragmentWalkLogBinding.inflate(inflater, container, false);
+        View root = binding.getRoot();
+
+        CurrentPet.getInstance().addWalksObserver(this);
+
+        if(CurrentPet.getInstance().getPetProfile() != null)
+            updateFragmentData();
+
+        return root;
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment WalkLogFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static WalkLogFragment newInstance(String param1, String param2) {
-        WalkLogFragment fragment = new WalkLogFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
+
+    private void updateFragmentData() {
+        getMealsList();
+        setWalksListView();
+        initListeners();
     }
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+    private void initListeners() {
+    }
+
+    private void getMealsList() {
+        if (CurrentPet.getInstance().getPetProfile() != null) {
+            this.walks = CurrentPet.getInstance().getPetProfile().getWalks();
+            this.walks.sort(Comparator.comparingLong(Walk::getDateTime).reversed());
+        }
+    }
+
+    private void setWalksListView() {
+        if (walks == null || walks.isEmpty()) {
+            binding.walksLogLSTWalks.setVisibility(View.GONE);
+            binding.walksLogTVEmpty.setVisibility(View.VISIBLE);
+        } else {
+            binding.walksLogLSTWalks.setVisibility(View.VISIBLE);
+            binding.walksLogTVEmpty.setVisibility(View.GONE);
+        }
+
+        walksAdapter = new WalksAdapter(this, walks);
+        binding.walksLogLSTWalks.setLayoutManager(new LinearLayoutManager(getContext()));
+        binding.walksLogLSTWalks.setAdapter(walksAdapter);
+        setWalksCallbacks();
+    }
+
+    private void setWalksCallbacks() {
+        walksAdapter.setWalkCallback(new WalkCallback() {
+            @Override
+            public void itemClicked(Walk walk, int position) {
+                // Do nothing for now, later on we will add the option to view the meal
+            }
+
+            @Override
+            public void deleteClicked(Walk walk, int position) {
+                deleteWalk(walk);
+            }
+        });
+    }
+
+    private void deleteWalk(Walk walk) {
+        if(CurrentPet.getInstance().getPetProfile().removeWalk(walk)) {
+            DataCrud.getInstance().setPetInDB(CurrentPet.getInstance().getPetProfile());
         }
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_walk_log, container, false);
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
+        CurrentPet.getInstance().removeWalksObserver(this);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+    }
+
+    @Override
+    public void onWalksListChanged() {
+
     }
 }

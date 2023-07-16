@@ -5,11 +5,17 @@
     <string name="title_pet_profile">Pet Profile</string>
     <string name="title_meals_log">Meals Log</string>
     <string name="title_user_greeting_prefix">Hello</string>
+    <string name="title_add_meal_type">Add Meal Type</string>
+    <string name="title_add_meal">Add Meal</string>
+    <string name="title_settings">Settings</string>
+    <string name="title_add_note">Add Note</string>
 
     <string name="button_upload">Upload Image</string>
     <string name="button_save">Save</string>
     <string name="button_add_pet">Add New Pet</string>
     <string name="button_home">Go to HomePage</string>
+    <string name="button_owners_list">Owners List</string>
+    <string name="button_add_owner">Add Owner</string>
 
     <string name="menu_home">Home</string>
     <string name="menu_meals_log">Meals Log</string>
@@ -25,25 +31,22 @@
     <string name="hint_amount">Amount</string>
     <string name="hint_units">Units</string>
     <string name="hint_phone_number">Phone</string>
+    <string name="hint_meal_name">Meal name</string>
+    <string name="hint_time">Meal Time</string>
+    <string name="hint_date">Date</string>
+    <string name="hint_owner_email">Owner\'s email</string>
+    <string name="hint_note">Write your note here</string>
 
     <string name="text_regular_meals">Regular Meals</string>
     <string name="text_as_icon_plus">+</string>
     <string name="text_regular_walks">Regular Walks</string>
 
     <string name="prompt_exists_pet_note">If your pet already has a profile in the app, please ask the owner to add it to your account. You can always add a new pet later.</string>
+    <string name="prompt_empty_meals_list">No meals to show</string>
 
     <string name="img_desc_meal_icon">Meal icon</string>
-    <string name="prompt_empty_meals_list">No meals to show</string>
-    <string name="title_add_meal_type">Add Meal Type</string>
-    <string name="hint_meal_name">Meal name</string>
-    <string name="hint_time">Meal Time</string>
-    <string name="title_add_meal">Add Meal</string>
-    <string name="hint_date">Date</string>
-    <string name="title_settings">Settings</string>
-    <string name="img_desc_pet_icon">Pet Icon</string>
-    <string name="button_owners_list">Owners List</string>
-    <string name="button_add_owner">Add Owner</string>
-    <string name="hint_owner_email">Owner\'s email</string>
+    <string name="img_desc_pet_icon">Pet icon</string>
+    <string name="img_desc_walk_icon" >Walk icon</string>
 
     <string-array name="Gender">
         <item>Male</item>

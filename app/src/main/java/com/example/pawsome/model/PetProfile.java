@@ -22,9 +22,11 @@ public class PetProfile {
     private long dateOfBirth;
     private List<String> ownersIds = new ArrayList<>();
     private List<MealType> mealTypes = new ArrayList<>();
+    private List<WalkType> walkTypes = new ArrayList<>();
     private List<Meal> meals = new ArrayList<>();
+    private List<Walk> walks = new ArrayList<>();
 
-    // TODO: change to walks like meals
+
     // TODO: change to walkType
 
     public PetProfile() {
@@ -104,8 +106,31 @@ public class PetProfile {
         return this;
     }
 
+    public List<WalkType> getWalkTypes() {
+        return walkTypes;
+    }
+
+    public PetProfile setWalkTypes(List<WalkType> walkTypes) {
+        this.walkTypes = walkTypes;
+        return this;
+    }
+
+    public List<Walk> getWalks() {
+        return walks;
+    }
+
+    public PetProfile setWalks(List<Walk> walks) {
+        this.walks = walks;
+        return this;
+    }
+
     public PetProfile addOwner(String ownerId) {
         this.ownersIds.add(ownerId);
+        return this;
+    }
+
+    public PetProfile removeOwner(String ownerId) {
+        this.ownersIds.remove(ownerId);
         return this;
     }
 
@@ -130,5 +155,45 @@ public class PetProfile {
 
         return this.mealTypes.remove(mealType);
     }
+
+    public boolean removeMeal(Meal meal) {
+        if(!this.meals.contains(meal))
+            return false;
+
+        return this.meals.remove(meal);
+    }
+
+    public boolean removeWalkType(WalkType walkType) {
+        if(!this.mealTypes.contains(walkType))
+            return false;
+
+        return this.mealTypes.remove(walkType);
+    }
+
+    public boolean removeWalk(Walk walk) {
+        if(!this.walks.contains(walk))
+            return false;
+
+        return this.walks.remove(walk);
+    }
+
+    public boolean isContainsOwner(String ownerId) {
+        return this.ownersIds.contains(ownerId);
+    }
+
+    @Override
+    public String toString() {
+        return "PetProfile{" +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
+                ", profileImage='" + profileImage + '\'' +
+                ", gender='" + gender + '\'' +
+                ", dateOfBirth=" + dateOfBirth +
+                ", ownersIds=" + ownersIds +
+                ", mealTypes=" + mealTypes +
+                ", meals=" + meals +
+                '}';
+    }
+
 
 }

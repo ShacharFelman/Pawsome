@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.pawsome.R;
-import com.example.pawsome.callbacks.PetCallback;
+import com.example.pawsome.callbacks.PetListCallback;
 import com.example.pawsome.model.PetProfile;
 import com.example.pawsome.utils.DateTimeConverter;
 import com.google.android.material.button.MaterialButton;
@@ -23,20 +23,20 @@ import java.time.LocalDate;
 import java.time.Period;
 import java.util.List;
 
-public class PetsAdapter extends RecyclerView.Adapter<PetsAdapter.PetViewHolder> {
+public class PetsListAdapter extends RecyclerView.Adapter<PetsListAdapter.PetViewHolder> {
 
     private final Fragment fragment;
     private List<PetProfile> petsList;
 
-    private PetCallback petCallback;
+    private PetListCallback petListCallback;
 
-    public PetsAdapter(Fragment fragment, List<PetProfile> petsList) {
+    public PetsListAdapter(Fragment fragment, List<PetProfile> petsList) {
         this.petsList = petsList;
         this.fragment = fragment;
     }
 
-    public PetsAdapter setPetCallback(PetCallback petCallback) {
-        this.petCallback = petCallback;
+    public PetsListAdapter setPetCallback(PetListCallback petListCallback) {
+        this.petListCallback = petListCallback;
         return this;
     }
 
@@ -58,7 +58,6 @@ public class PetsAdapter extends RecyclerView.Adapter<PetsAdapter.PetViewHolder>
                 load(pet.getProfileImage()).
                 into(holder.pet_item_IMG_pet);
     }
-
 
     public int calcAge(LocalDate dob) {
         LocalDate now = LocalDate.now();
@@ -99,8 +98,8 @@ public class PetsAdapter extends RecyclerView.Adapter<PetsAdapter.PetViewHolder>
         public PetViewHolder(@NonNull View itemView) {
             super(itemView);
             initViews();
-            itemView.setOnClickListener(view -> petCallback.itemClicked(getItem(getAdapterPosition()), getAdapterPosition()));
-            pet_item_BTN_delete.setOnClickListener(view -> petCallback.deleteClicked(getItem(getAdapterPosition()), getAdapterPosition()));
+            itemView.setOnClickListener(view -> petListCallback.itemClicked(getItem(getAdapterPosition()), getAdapterPosition()));
+            pet_item_BTN_delete.setOnClickListener(view -> petListCallback.deleteClicked(getItem(getAdapterPosition()), getAdapterPosition()));
         }
 
         private void initViews() {

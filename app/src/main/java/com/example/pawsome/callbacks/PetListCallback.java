@@ -1,9 +1,8 @@
 package com.example.pawsome.callbacks;
 
-import com.example.pawsome.model.Meal;
 import com.example.pawsome.model.PetProfile;
 
-public interface PetCallback {
+public interface PetListCallback {
     void deleteClicked(PetProfile pet, int position);
     void itemClicked(PetProfile pet, int position);
 }

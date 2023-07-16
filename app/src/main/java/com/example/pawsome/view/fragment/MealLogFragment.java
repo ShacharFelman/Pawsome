@@ -6,20 +6,25 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.pawsome.adapters.MealsAdapter;
-import com.example.pawsome.current_state.CurrentPet;
-import com.example.pawsome.current_state.PetProfileObserver;
+import com.example.pawsome.callbacks.MealCallback;
+import com.example.pawsome.callbacks.PetListCallback;
+import com.example.pawsome.current_state.singletons.CurrentPet;
+import com.example.pawsome.current_state.observers.PetMealsObserver;
+import com.example.pawsome.dal.DataCrud;
 import com.example.pawsome.databinding.FragmentMealLogBinding;
 import com.example.pawsome.model.Meal;
+import com.example.pawsome.model.PetProfile;
 
 import java.util.Comparator;
 import java.util.List;
 
-public class MealLogFragment extends Fragment implements PetProfileObserver {
+public class MealLogFragment extends Fragment implements PetMealsObserver {
     private FragmentMealLogBinding binding;
     private MealsAdapter mealsAdapter;
     private List<Meal> meals;
@@ -29,7 +34,7 @@ public class MealLogFragment extends Fragment implements PetProfileObserver {
         binding = FragmentMealLogBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        CurrentPet.getInstance().addObserver(this);
+        CurrentPet.getInstance().addMealsObserver(this);
 
         if(CurrentPet.getInstance().getPetProfile() != null)
             updateFragmentData();
@@ -65,13 +70,34 @@ public class MealLogFragment extends Fragment implements PetProfileObserver {
         mealsAdapter = new MealsAdapter(this, meals);
         binding.mealsLogLSTMeals.setLayoutManager(new LinearLayoutManager(getContext()));
         binding.mealsLogLSTMeals.setAdapter(mealsAdapter);
+        setMealsCallbacks();
+    }
+
+    private void setMealsCallbacks() {
+        mealsAdapter.setMealCallback(new MealCallback() {
+            @Override
+            public void itemClicked(Meal meal, int position) {
+                // Do nothing for now, later on we will add the option to view the meal
+            }
+
+            @Override
+            public void deleteClicked(Meal meal, int position) {
+                deleteMeal(meal);
+            }
+        });
+    }
+
+    private void deleteMeal(Meal meal) {
+        if(CurrentPet.getInstance().getPetProfile().removeMeal(meal)) {
+            DataCrud.getInstance().setPetInDB(CurrentPet.getInstance().getPetProfile());
+        }
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
-        CurrentPet.getInstance().removeObserver(this);
+        CurrentPet.getInstance().removeMealsObserver(this);
     }
 
     @Override
@@ -80,7 +106,7 @@ public class MealLogFragment extends Fragment implements PetProfileObserver {
     }
 
     @Override
-    public void onPetProfileChanged() {
+    public void onMealsListChanged() {
         updateFragmentData();
     }
 }

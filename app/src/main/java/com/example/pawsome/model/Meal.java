@@ -11,7 +11,6 @@ import java.util.UUID;
 public class Meal {
 
     private UserProfile owner;
-//    private String petId;
     private long dateTime;
     private String note;
     private MealType mealType;
@@ -20,7 +19,6 @@ public class Meal {
 
     private int amount;
     private String unit;
-    private String foodType;
 
     public Meal() {
     }
@@ -52,31 +50,12 @@ public class Meal {
         return this;
     }
 
-//    public String getPetId() {
-//        return petId;
-//    }
-
-//    public Meal setPetId(String petId) {
-//        this.petId = petId;
-//        return this;
-//    }
-
     public MealType getMealType() {
         return mealType;
     }
 
     public Meal setMealType(MealType mealType) {
         this.mealType = mealType;
-        return this;
-    }
-
-    public LocalDateTime getDateTimeAsLocalDateTime() {
-        return LocalDateTime.ofInstant(Instant.ofEpochMilli(this.dateTime), ZoneId.systemDefault());
-    }
-
-    public Meal setDateTimeAsLocalDateTime(LocalDateTime dateTime) {
-        ZonedDateTime zdt = ZonedDateTime.of(dateTime, ZoneId.systemDefault());
-        this.dateTime = zdt.toInstant().toEpochMilli();
         return this;
     }
 
@@ -98,38 +77,12 @@ public class Meal {
         return this;
     }
 
-    public String getFoodType() {
-        return foodType;
-    }
-
-    public Meal setFoodType(String foodType) {
-        this.foodType = foodType;
-        return this;
-    }
-
     public String getName() {
         return name;
     }
 
     public Meal setName(String name) {
         this.name = name;
-        return this;
-    }
-
-    public Meal setMealDefaultDataFromMealType() {
-        if(this.mealType != null) {
-            this.amount = this.mealType.getAmount();
-            this.unit = this.mealType.getUnit();
-            this.foodType = this.mealType.getFoodType();
-        }
-
-        return this;
-    }
-
-    public Meal setMealDefaultDataFromMealType(MealType mealType) {
-        this.amount = mealType.getAmount();
-        this.unit = mealType.getUnit();
-        this.foodType = mealType.getFoodType();
         return this;
     }
 
@@ -144,7 +97,6 @@ public class Meal {
                 ", name='" + name + '\'' +
                 ", amount=" + amount +
                 ", unit='" + unit + '\'' +
-                ", foodType='" + foodType + '\'' +
                 '}';
     }
 }
