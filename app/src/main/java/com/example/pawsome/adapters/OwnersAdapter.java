@@ -65,12 +65,6 @@ public class OwnersAdapter extends RecyclerView.Adapter<OwnersAdapter.OwnerViewH
                 into(holder.owner_IMG_user);
     }
 
-
-    public int calcAge(LocalDate dob) {
-        LocalDate now = LocalDate.now();
-        return Period.between(dob, now).getYears();
-    }
-
     private UserProfile getItem(int position) {
         return owners.get(position);
     }
@@ -78,15 +72,6 @@ public class OwnersAdapter extends RecyclerView.Adapter<OwnersAdapter.OwnerViewH
     @Override
     public int getItemCount() {
         return owners == null ? 0 : owners.size();
-    }
-
-    public void updateOwnersList(List<UserProfile> owners) {
-        this.owners = owners;
-        notifyDataSetChanged();
-    }
-
-    public List<UserProfile> getOwners() {
-        return owners;
     }
 
     public class OwnerViewHolder extends RecyclerView.ViewHolder {
