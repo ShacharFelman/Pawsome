@@ -45,4 +45,8 @@ public class FirebaseDB {
         return getDatabaseReference(Constants.DB_USERS);
     }
 
+    public DatabaseReference getPetsReference() {
+        return getDatabaseReference(Constants.DB_PETS);
+    }
+
 }

@@ -692,6 +692,7 @@ public class PetProfileActivity extends AppCompatActivity {
 
     private void loadOwnersData() {
         if (petProfile.getOwnersIds() != null && !petProfile.getOwnersIds().isEmpty()) {
+            owners.clear();
             for (String ownerId : petProfile.getOwnersIds()) {
                 DataCrud.getInstance().getUserReference(ownerId).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
@@ -866,8 +867,10 @@ public class PetProfileActivity extends AppCompatActivity {
         DataCrud.getInstance().setUserInDB(user);
         DataCrud.getInstance().setPetInDB(petProfile);
 
-        if (isOwnerAdded)
+        if (isOwnerAdded) {
             SignalUtils.getInstance().toast("Owner added successfully");
+            loadOwnersData();
+        }
     }
 
     private void setImageUploadingView(boolean isUploading) {

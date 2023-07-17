@@ -2,7 +2,6 @@ package com.example.pawsome.view.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.MenuItem;
 
@@ -37,6 +36,8 @@ public class MainActivity extends AppCompatActivity implements UserPetsListObser
     private static final int menu_walks = R.id.menu_FRG_walks;
     private static final int menu_settings = R.id.menu_FRG_settings;
     private boolean isActivityVisible = true;
+    private boolean isPetsListChangedPending = false;
+
 
     private ActivityMainBinding binding;
 
@@ -62,6 +63,10 @@ public class MainActivity extends AppCompatActivity implements UserPetsListObser
     protected void onResume() {
         super.onResume();
         isActivityVisible = true;
+        if(isPetsListChangedPending) {
+            isPetsListChangedPending = false;
+            petsListChanged();
+        }
     }
 
     @Override
@@ -139,11 +144,7 @@ public class MainActivity extends AppCompatActivity implements UserPetsListObser
     private void setNoPets() {
         for (int i = 0; i < binding.mainBNVMenu.getMenu().size(); i++) {
             MenuItem menuItem = binding.mainBNVMenu.getMenu().getItem(i);
-            if (menuItem.getItemId() == menu_settings) {
-                menuItem.setEnabled(true);
-            } else {
-                menuItem.setEnabled(false);
-            }
+            menuItem.setEnabled(menuItem.getItemId() == menu_settings);
         }
         setTopFragment();
         binding.mainBNVMenu.setSelectedItemId(menu_settings);
@@ -189,6 +190,24 @@ public class MainActivity extends AppCompatActivity implements UserPetsListObser
         finish();
     }
 
+    private void petsListChanged() {
+        if(!CurrentUser.getInstance().getUserProfile().hasPets()) {
+            setNoPets();
+        }
+        else {
+            if(CurrentPet.getInstance().getPetProfile() == null) {
+                CurrentPet.getInstance().setPetProfile(CurrentUserPetsList.getInstance().getPets().get(0));
+            }
+            else if(!CurrentPet.getInstance().getPetProfile().isContainsOwner(CurrentUser.getInstance().getUid())) {
+                CurrentPet.getInstance().setPetProfile(CurrentUserPetsList.getInstance().getPets().get(0));
+            }
+
+            setTopFragment();
+            binding.mainBNVMenu.setSelectedItemId(binding.mainBNVMenu.getSelectedItemId());
+//            binding.mainBNVMenu.setSelectedItemId(menu_home);
+        }
+    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -197,18 +216,9 @@ public class MainActivity extends AppCompatActivity implements UserPetsListObser
 
     @Override
     public void onPetsListChanged() {
-        if(!isActivityVisible)
-            return;
-
-        if(!CurrentUser.getInstance().getUserProfile().hasPets()) {
-            setNoPets();
-        }
-        else {
-            if(CurrentPet.getInstance().getPetProfile() == null)
-                CurrentPet.getInstance().setPetProfile(CurrentUserPetsList.getInstance().getPets().get(0));
-
-            setTopFragment();
-            binding.mainBNVMenu.setSelectedItemId(menu_home);
-        }
+        if(isActivityVisible)
+            petsListChanged();
+        else
+            isPetsListChangedPending = true;
     }
 }

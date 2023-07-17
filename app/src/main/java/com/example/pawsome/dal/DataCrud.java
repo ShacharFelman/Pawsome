@@ -1,15 +1,10 @@
 package com.example.pawsome.dal;
 
-import android.util.Log;
-
-import androidx.annotation.NonNull;
-
+import com.example.pawsome.current_state.singletons.CurrentUser;
+import com.example.pawsome.current_state.singletons.CurrentUserPetsList;
 import com.example.pawsome.model.PetProfile;
 import com.example.pawsome.model.UserProfile;
 import com.example.pawsome.utils.Constants;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 
 public class DataCrud {
@@ -36,6 +31,8 @@ public class DataCrud {
 
     public void setPetInDB(PetProfile petProfile) {
         petsDatabaseReference.child(petProfile.getId()).setValue(petProfile);
+        if(CurrentUser.getInstance().getUserProfile().isOwner(petProfile.getId()))
+            CurrentUserPetsList.getInstance().getPetsData();
     }
 
     public DatabaseReference getUserReference(String uid) {
@@ -48,22 +45,19 @@ public class DataCrud {
 
     public void deletePetFromDB(String petId) {
         petsDatabaseReference.child(petId).removeValue();
+        FilesCrud.getInstance().deletePetImageFromDB(petId);
     }
 
-    public void deletePetFromUser(String petId, String userId) {
-        usersDatabaseReference.child(userId).child("petsIds").child(petId).removeValue();
-
-        DataCrud.getInstance().getUserReference(userId).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DataSnapshot> task) {
-                if (!task.isSuccessful()) {
-                    Log.e("firebase", "Error getting data", task.getException());
-                } else {
-                    if (task.getResult().getValue() != null)
-                        _deletePetFromUser(petId, task.getResult().getValue(UserProfile.class));
+    public void deletePetFromUser(String userId, String petId) {
+        DataCrud.getInstance().getUserReference(userId).get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                if (task.getResult().getValue() != null) {
+                    UserProfile user = task.getResult().getValue(UserProfile.class);
+                    _deletePetFromUser(petId, user);
                 }
             }
         });
+
     }
 
     private void _deletePetFromUser(String petId, UserProfile user) {

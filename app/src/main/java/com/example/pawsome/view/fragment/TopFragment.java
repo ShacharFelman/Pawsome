@@ -51,12 +51,11 @@ public class TopFragment extends Fragment /* implements UserPetsListObserver */ 
     @Override
     public void onResume() {
         super.onResume();
-
-
     }
 
     private void initButtonsListeners() {
         binding.topBTNLogout.setOnClickListener(v -> ((MainActivity) getActivity()).signOut());
+        binding.topBTNRefresh.setOnClickListener(v -> CurrentUserPetsList.getInstance().getPetsData());
     }
 
     private void initPetListView() {

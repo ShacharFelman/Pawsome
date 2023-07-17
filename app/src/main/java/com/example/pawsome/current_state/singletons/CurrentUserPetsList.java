@@ -1,7 +1,5 @@
 package com.example.pawsome.current_state.singletons;
 
-import android.util.Log;
-
 import androidx.annotation.NonNull;
 
 import com.example.pawsome.current_state.observers.UserPetsListObserver;
@@ -59,6 +57,7 @@ public class CurrentUserPetsList implements UserProfileObserver {
 
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {
+                        isPetsListLoaded = true;
                     }
                 });
             }
@@ -75,10 +74,6 @@ public class CurrentUserPetsList implements UserProfileObserver {
         pets = new ArrayList<>(petProfileMap.values());
     }
 
-    public boolean isPetsListLoaded() {
-        return isPetsListLoaded;
-    }
-
     public void registerListener(UserPetsListObserver observer) {
         observers.add(observer);
     }
@@ -93,19 +88,9 @@ public class CurrentUserPetsList implements UserProfileObserver {
         }
     }
 
-    public CurrentUserPetsList setPets(List<PetProfile> pets) {
-        this.pets = pets;
-        return this;
-    }
-
-    public CurrentUserPetsList setPetsListLoaded(boolean petsListLoaded) {
-        isPetsListLoaded = petsListLoaded;
-        return this;
-    }
-
     @Override
     public void onPetsListChanged() {
-        if (isPetsListLoaded)
+//        if (isPetsListLoaded)
             getPetsData();
     }
 }

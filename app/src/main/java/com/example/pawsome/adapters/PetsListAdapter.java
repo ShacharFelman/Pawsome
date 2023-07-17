@@ -21,7 +21,10 @@ import com.google.android.material.textview.MaterialTextView;
 
 import java.time.LocalDate;
 import java.time.Period;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 public class PetsListAdapter extends RecyclerView.Adapter<PetsListAdapter.PetViewHolder> {
 
@@ -31,7 +34,12 @@ public class PetsListAdapter extends RecyclerView.Adapter<PetsListAdapter.PetVie
     private PetListCallback petListCallback;
 
     public PetsListAdapter(Fragment fragment, List<PetProfile> petsList) {
-        this.petsList = petsList;
+        Map<String, PetProfile> uniqueMap = new LinkedHashMap<>();
+        for (PetProfile pet : petsList) {
+            uniqueMap.put(pet.getId(), pet);
+        }
+        this.petsList = new ArrayList<>(uniqueMap.values());
+//        this.petsList = petsList;
         this.fragment = fragment;
     }
 
@@ -72,17 +80,6 @@ public class PetsListAdapter extends RecyclerView.Adapter<PetsListAdapter.PetVie
     public int getItemCount() {
         return petsList == null ? 0 : petsList.size();
     }
-
-    public void updatePetsList(List<PetProfile> petsList) {
-        this.petsList = petsList;
-        notifyDataSetChanged();
-    }
-
-//    public void deleteMeal(String mealId) {
-//        if (mealsList.containsKey(mealId))
-//            mealsList.remove(mealId);
-//        notifyDataSetChanged();
-//    }
 
     public List<PetProfile> getPetsList() {
         return petsList;

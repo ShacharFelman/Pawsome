@@ -26,7 +26,7 @@
             android:layout_below="@+id/pet_LBL_title">
             <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="wrap_content">
 
                 <com.google.android.material.progressindicator.CircularProgressIndicator
                     android:id="@+id/pet_CPI_pets_loading"
@@ -80,7 +80,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="@string/button_owners_list"
-                        android:textSize="12dp"
+                        android:textSize="12sp"
                         android:textAllCaps="false"/>
 
                     <View
@@ -94,7 +94,7 @@
                         android:layout_weight="1"
                         android:text="@string/button_add_owner"
                         android:textAllCaps="false"
-                        android:textSize="12dp"
+                        android:textSize="12sp"
                         />
 
                 </androidx.appcompat.widget.LinearLayoutCompat>
@@ -119,6 +119,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
+                        android:paddingHorizontal="10dp"
                         android:visibility="gone">
                         <com.google.android.material.textfield.TextInputLayout
                             android:id="@+id/pet_EDT_owner_email"

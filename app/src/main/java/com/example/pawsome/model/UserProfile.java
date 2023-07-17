@@ -104,6 +104,10 @@ public class UserProfile {
         return this;
     }
 
+    public boolean isOwner(String petId) {
+        return petsIds.contains(petId);
+    }
+
     @Override
     public String toString() {
         return this.name;

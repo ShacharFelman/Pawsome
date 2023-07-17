@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import com.bumptech.glide.Glide;
 import com.example.pawsome.adapters.PetsListAdapter;
 import com.example.pawsome.callbacks.PetListCallback;
+import com.example.pawsome.current_state.observers.UserPetsListObserver;
 import com.example.pawsome.current_state.singletons.CurrentUser;
 import com.example.pawsome.current_state.singletons.CurrentUserPetsList;
 import com.example.pawsome.dal.DataCrud;
@@ -20,15 +21,12 @@ import com.example.pawsome.databinding.FragmentSettingsBinding;
 import com.example.pawsome.model.PetProfile;
 import com.example.pawsome.view.activity.MainActivity;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
 
 
-public class SettingsFragment extends Fragment {
+public class SettingsFragment extends Fragment implements UserPetsListObserver {
 
     private FragmentSettingsBinding binding;
     private PetsListAdapter petsListAdapter;
@@ -81,31 +79,36 @@ public class SettingsFragment extends Fragment {
         });
     }
 
+//    private void getPetsData() {
+//        if (CurrentUser.getInstance().getUserProfile().hasPets()) {
+//            pets.clear();
+//            binding.settingsCPIPetsLoading.setVisibility(View.VISIBLE);
+//            for (String petId : CurrentUser.getInstance().getUserProfile().getPetsIds()) {
+//                DataCrud.getInstance().getPetReference(petId).addListenerForSingleValueEvent(new ValueEventListener() {
+//                    @Override
+//                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                        if (snapshot.exists()) {
+//                            pets.add(snapshot.getValue(PetProfile.class));
+//                            if (pets.size() == CurrentUser.getInstance().getUserProfile().getPetsIds().size()) {
+//                                setPetsListView();
+//                                binding.settingsCPIPetsLoading.setVisibility(View.INVISIBLE);
+//                            }
+//                        }
+//                    }
+//
+//                    @Override
+//                    public void onCancelled(@NonNull DatabaseError error) {
+//                    }
+//                });
+//            }
+//        }
+//    }
+
     private void getPetsData() {
-        if (CurrentUser.getInstance().getUserProfile().hasPets()) {
-            pets.clear();
-            binding.settingsCPIPetsLoading.setVisibility(View.VISIBLE);
-            for (String petId : CurrentUser.getInstance().getUserProfile().getPetsIds()) {
-                DataCrud.getInstance().getPetReference(petId).addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        if (snapshot.exists()) {
-                            pets.add(snapshot.getValue(PetProfile.class));
-                            if (pets.size() == CurrentUser.getInstance().getUserProfile().getPetsIds().size()) {
-                                setPetsListView();
-                                binding.settingsCPIPetsLoading.setVisibility(View.INVISIBLE);
-                            }
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-                    }
-                });
-            }
-        }
+        pets = CurrentUserPetsList.getInstance().getPets();
+        setPetsListView();
+        binding.settingsCPIPetsLoading.setVisibility(View.INVISIBLE);
     }
-
 
 
     private void deletePetPressed(PetProfile pet) {
@@ -133,8 +136,11 @@ public class SettingsFragment extends Fragment {
         CurrentUser.getInstance().getUserProfile().deletePet(pet.getId());
         CurrentUser.getInstance().saveCurrentUserToDB();
 
-        pets.remove(pet);
-        petsListAdapter.notifyDataSetChanged();
+        pet.removeOwner(CurrentUser.getInstance().getUserProfile().getUid());
+        DataCrud.getInstance().setPetInDB(pet);
+
+//        pets.remove(pet);
+//        petsListAdapter.notifyDataSetChanged();
         CurrentUserPetsList.getInstance().getPetsData();
     }
 
@@ -161,4 +167,8 @@ public class SettingsFragment extends Fragment {
         super.onPause();
     }
 
+    @Override
+    public void onPetsListChanged() {
+        getPetsData();
+    }
 }

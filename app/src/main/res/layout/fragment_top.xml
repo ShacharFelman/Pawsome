@@ -14,15 +14,32 @@
         android:scaleType="centerCrop"
         android:alpha="0.2" />
 
-    <androidx.appcompat.widget.AppCompatImageButton
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/top_BTN_logout"
+        style="@style/Widget.Material3.Button.IconButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/ic_logout"
+        android:layout_gravity="center_horizontal"
         android:layout_alignParentEnd="true"
         android:layout_marginEnd="6dp"
         android:layout_marginTop="5dp"
-        android:backgroundTint="#00FFFFFF"/>
+        android:textAllCaps="false"
+        app:icon="@drawable/ic_logout"
+        app:iconTint="@color/white"
+        app:iconSize="35dp" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/top_BTN_refresh"
+        style="@style/Widget.Material3.Button.IconButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginStart="6dp"
+        android:layout_marginTop="5dp"
+        android:textAllCaps="false"
+        app:icon="@drawable/ic_refresh"
+        app:iconTint="@color/white"
+        app:iconSize="30dp" />
 
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/top_TV_title"

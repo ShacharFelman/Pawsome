@@ -29,5 +29,9 @@ public class FilesCrud {
         return petsImagesStorageReference.child(id);
     }
 
+    public void deletePetImageFromDB(String petId) {
+        getPetFileReference(petId).delete();
+    }
+
 
 }
