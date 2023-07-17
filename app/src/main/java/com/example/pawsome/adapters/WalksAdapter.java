@@ -57,8 +57,8 @@ public class WalksAdapter extends RecyclerView.Adapter<WalksAdapter.WalkViewHold
         holder.walk_TV_note.setText(walk.getNote());
         holder.walk_TV_duration.setText(walk.getName() + ", " + walk.getDurationInMinutes() + " min");
         holder.walk_TV_rate.setText((int)walk.getRate() + "/5");
-        holder.walk_IMG_poop.setVisibility(!walk.getPoop() ? View.VISIBLE : View.GONE);
-        holder.walk_IMG_play.setVisibility(!walk.getPlay() ? View.VISIBLE : View.GONE);
+        holder.walk_IMG_poop.setVisibility(walk.getPoop() ? View.GONE : View.VISIBLE);
+        holder.walk_IMG_play.setVisibility(walk.getPlay() ? View.VISIBLE : View.GONE);
         Glide.
                 with(fragment.getContext()).
                 load(walk.getOwner().getProfileImage()).

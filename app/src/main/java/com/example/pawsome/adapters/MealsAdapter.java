@@ -1,7 +1,6 @@
 package com.example.pawsome.adapters;
 
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -57,6 +56,7 @@ public class MealsAdapter extends RecyclerView.Adapter<MealsAdapter.MealViewHold
         holder.meal_TV_date.setText(DateTimeConverter.longToStringDate(meal.getDateTime()));
         holder.meal_TV_note.setText(meal.getNote());
         holder.meal_TV_type.setText(meal.getName());
+        holder.meal_TV_amount_units.setText(meal.getAmount() + " " + meal.getUnit());
         Glide.
                 with(fragment.getContext()).
                 load(meal.getOwner().getProfileImage()).
@@ -93,6 +93,7 @@ public class MealsAdapter extends RecyclerView.Adapter<MealsAdapter.MealViewHold
         private MaterialTextView meal_TV_time;
         private MaterialTextView meal_TV_date;
         private MaterialTextView meal_TV_type;
+        private MaterialTextView meal_TV_amount_units;
         private MaterialTextView meal_TV_note;
         private MaterialButton meal_BTN_delete;
         private MaterialCardView meal_CV_item;
@@ -110,6 +111,7 @@ public class MealsAdapter extends RecyclerView.Adapter<MealsAdapter.MealViewHold
             meal_TV_time = itemView.findViewById(R.id.meal_TV_time);
             meal_TV_date = itemView.findViewById(R.id.meal_TV_date);
             meal_TV_type = itemView.findViewById(R.id.meal_TV_type);
+            meal_TV_amount_units = itemView.findViewById(R.id.meal_TV_amount_units);
             meal_TV_note = itemView.findViewById(R.id.meal_TV_note);
             meal_BTN_delete = itemView.findViewById(R.id.meal_BTN_delete);
             meal_CV_item = itemView.findViewById(R.id.meal_CV_item);

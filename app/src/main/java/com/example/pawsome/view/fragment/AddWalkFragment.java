@@ -243,8 +243,11 @@ public class AddWalkFragment extends Fragment {
             if (selectedWalkType.getName() != null && !selectedWalkType.getName().isEmpty())
                 binding.addWalkEDTName.getEditText().setText(selectedWalkType.getName());
 
-            if (selectedWalkType.getDurationInMinutes() != 0)
+            if (selectedWalkType.getDurationInMinutes() != 0) {
                 binding.addWalkEDTDuration.getEditText().setText(selectedWalkType.getDurationAsString());
+                duration_hours = selectedWalkType.getDurationInMinutes() / 60;
+                duration_minutes = selectedWalkType.getDurationInMinutes() % 60;
+            }
 
             binding.addWalkCBPee.setChecked(selectedWalkType.getPee());
             binding.addWalkCBPoop.setChecked(selectedWalkType.getPoop());

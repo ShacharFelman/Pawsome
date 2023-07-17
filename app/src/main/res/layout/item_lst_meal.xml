@@ -16,7 +16,7 @@
         android:layout_height="match_parent"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
-        android:paddingVertical="10dp">
+        android:paddingVertical="5dp">
 
         <androidx.appcompat.widget.LinearLayoutCompat
             android:layout_width="match_parent"
@@ -117,11 +117,21 @@
                 </androidx.appcompat.widget.LinearLayoutCompat>
 
                 <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/meal_TV_amount_units"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:text="140 gr"
+                    android:textColor="@color/colorRecycleItemSecondaryText"
+                    android:textSize="16sp" />
+
+                <com.google.android.material.textview.MaterialTextView
                     android:id="@+id/meal_TV_note"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="5dp"
-                    android:maxLength="35"
+                    android:layout_marginEnd="60dp"
+                    android:maxLength="25"
                     android:text="note"
                     android:textColor="@color/colorRecycleItemPrimaryText"
                     android:textSize="16sp" />
