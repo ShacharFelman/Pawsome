@@ -14,7 +14,6 @@ import com.bumptech.glide.Glide;
 import com.example.pawsome.R;
 import com.example.pawsome.callbacks.WalkCallback;
 import com.example.pawsome.current_state.singletons.CurrentUser;
-import com.example.pawsome.model.Meal;
 import com.example.pawsome.model.Walk;
 import com.example.pawsome.utils.DateTimeConverter;
 import com.google.android.material.button.MaterialButton;
@@ -56,8 +55,10 @@ public class WalksAdapter extends RecyclerView.Adapter<WalksAdapter.WalkViewHold
         holder.walk_TV_time.setText(DateTimeConverter.longToStringTime(walk.getDateTime()));
         holder.walk_TV_date.setText(DateTimeConverter.longToStringDate(walk.getDateTime()));
         holder.walk_TV_note.setText(walk.getNote());
-        holder.walk_TV_type_duration.setText(walk.getName() + ", " + walk.getDurationInMinutes() + " min");
-        holder.walk_IMG_poop.setVisibility(!walk.isPoop() ? View.VISIBLE : View.GONE);
+        holder.walk_TV_duration.setText(walk.getName() + ", " + walk.getDurationInMinutes() + " min");
+        holder.walk_TV_rate.setText((int)walk.getRate() + "/5");
+        holder.walk_IMG_poop.setVisibility(!walk.getPoop() ? View.VISIBLE : View.GONE);
+        holder.walk_IMG_play.setVisibility(!walk.getPlay() ? View.VISIBLE : View.GONE);
         Glide.
                 with(fragment.getContext()).
                 load(walk.getOwner().getProfileImage()).
@@ -94,8 +95,10 @@ public class WalksAdapter extends RecyclerView.Adapter<WalksAdapter.WalkViewHold
         private MaterialTextView walk_TV_user;
         private MaterialTextView walk_TV_time;
         private MaterialTextView walk_TV_date;
-        private MaterialTextView walk_TV_type_duration;
+        private MaterialTextView walk_TV_duration;
+        private MaterialTextView walk_TV_rate;
         private ImageView walk_IMG_poop;
+        private ImageView walk_IMG_play;
         private MaterialTextView walk_TV_note;
         private MaterialButton walk_BTN_delete;
 
@@ -112,8 +115,10 @@ public class WalksAdapter extends RecyclerView.Adapter<WalksAdapter.WalkViewHold
             walk_TV_user = itemView.findViewById(R.id.walk_TV_user);
             walk_TV_time = itemView.findViewById(R.id.walk_TV_time);
             walk_TV_date = itemView.findViewById(R.id.walk_TV_date);
-            walk_TV_type_duration = itemView.findViewById(R.id.walk_TV_type_duration);
+            walk_TV_duration = itemView.findViewById(R.id.walk_TV_duration);
+            walk_TV_rate = itemView.findViewById(R.id.walk_TV_rate);
             walk_IMG_poop = itemView.findViewById(R.id.walk_IMG_poop);
+            walk_IMG_play = itemView.findViewById(R.id.walk_IMG_play);
             walk_TV_note = itemView.findViewById(R.id.walk_TV_note);
             walk_BTN_delete = itemView.findViewById(R.id.walk_BTN_delete);
         }

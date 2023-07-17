@@ -63,7 +63,7 @@ public class Walk {
         return this;
     }
 
-    public boolean isPoop() {
+    public boolean getPoop() {
         return poop;
     }
 
@@ -72,7 +72,7 @@ public class Walk {
         return this;
     }
 
-    public boolean isPee() {
+    public boolean getPee() {
         return pee;
     }
 

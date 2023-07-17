@@ -5,7 +5,8 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
-import android.util.Log;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -89,6 +90,8 @@ public class AddMealFragment extends Fragment {
         binding.addMealBTNAddNote.setOnClickListener(v -> showAddNote());
         binding.addMealCVNote.noteBTNCancel.setOnClickListener(v -> hideAddNote());
         binding.addMealCVNote.noteBTNSave.setOnClickListener(v -> saveNoteText());
+
+        setTextChangedListeners();
     }
 
 
@@ -261,7 +264,7 @@ public class AddMealFragment extends Fragment {
     }
 
     private void saveMeal() {
-        if (CurrentPet.getInstance().getPetProfile() != null) {
+        if (validateMealFields() && CurrentPet.getInstance().getPetProfile() != null) {
             Meal meal = new Meal();
 
             String date = binding.addMealEDTDate.getEditText().getText().toString();
@@ -283,6 +286,114 @@ public class AddMealFragment extends Fragment {
             ((MainActivity) getActivity()).selectMealLogFragmentOnMenu();
         }
     }
+
+    private boolean validateMealFields() {
+        if (binding.addMealEDTName.getEditText().getText().toString().isEmpty()) {
+            binding.addMealEDTName.setError("Name is required!");
+            return false;
+        }
+        if (binding.addMealEDTTime.getEditText().getText().toString().isEmpty()) {
+            binding.addMealEDTTime.setError("Time is required!");
+            return false;
+        } 
+        if (binding.addMealEDTDate.getEditText().getText().toString().isEmpty()) {
+            binding.addMealEDTDate.setError("Date is required!");
+            return false;
+        }
+        if (binding.addMealEDTAmount.getEditText().getText().toString().isEmpty()) {
+            binding.addMealEDTAmount.setError("Amount is required!");
+            return false;
+        }
+        if (binding.addMealEDTUnit.getEditText().getText().toString().isEmpty()) {
+            binding.addMealEDTUnit.setError("Unit is required!");
+            return false;
+        }
+
+        return true;
+    }
+
+    private void setTextChangedListeners() {
+        binding.addMealEDTName.getEditText().addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence name, int start, int before, int count) {
+                if (!binding.addMealEDTName.getEditText().getText().toString().isEmpty())
+                    binding.addMealEDTName.setError(null);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+        });
+
+        binding.addMealEDTAmount.getEditText().addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence amount, int start, int before, int count) {
+                if (!binding.addMealEDTAmount.getEditText().getText().toString().isEmpty())
+                    binding.addMealEDTAmount.setError(null);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+        });
+
+        binding.addMealEDTUnit.getEditText().addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence unit, int start, int before, int count) {
+                if (!binding.addMealEDTUnit.getEditText().getText().toString().isEmpty())
+                    binding.addMealEDTUnit.setError(null);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+        });
+
+        binding.addMealEDTTime.getEditText().addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence time, int start, int before, int count) {
+                if (!binding.addMealEDTTime.getEditText().getText().toString().isEmpty())
+                    binding.addMealEDTTime.setError(null);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+        });
+
+        binding.addMealEDTDate.getEditText().addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence date, int start, int before, int count) {
+                if (!binding.addMealEDTDate.getEditText().getText().toString().isEmpty())
+                    binding.addMealEDTDate.setError(null);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+        });
+    }
+
 
     @Override
     public void onDestroyView() {

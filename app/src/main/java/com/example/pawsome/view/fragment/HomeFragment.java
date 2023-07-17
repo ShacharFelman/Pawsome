@@ -1,26 +1,19 @@
 package com.example.pawsome.view.fragment;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.bumptech.glide.Glide;
-import com.example.pawsome.adapters.WalksAdapter;
-import com.example.pawsome.callbacks.WalkCallback;
 import com.example.pawsome.current_state.observers.PetMealsObserver;
 import com.example.pawsome.current_state.observers.PetWalksObserver;
 import com.example.pawsome.current_state.singletons.CurrentPet;
 import com.example.pawsome.current_state.singletons.CurrentUser;
-import com.example.pawsome.dal.DataCrud;
 import com.example.pawsome.databinding.FragmentHomeBinding;
-import com.example.pawsome.databinding.FragmentWalkLogBinding;
 import com.example.pawsome.model.Meal;
 import com.example.pawsome.model.Walk;
 import com.example.pawsome.utils.DateTimeConverter;
@@ -88,8 +81,10 @@ public class HomeFragment extends Fragment implements PetWalksObserver, PetMeals
         binding.homeITMWalk.walkTVTime.setText(DateTimeConverter.longToStringTime(lastWalk.getDateTime()));
         binding.homeITMWalk.walkTVDate.setText(DateTimeConverter.longToStringDate(lastWalk.getDateTime()));
         binding.homeITMWalk.walkTVNote.setText(lastWalk.getNote());
-        binding.homeITMWalk.walkTVTypeDuration.setText(lastWalk.getName() + ", " + lastWalk.getDurationInMinutes() + " min");
-        binding.homeITMWalk.walkIMGPoop.setVisibility(!lastWalk.isPoop() ? View.VISIBLE : View.GONE);
+        binding.homeITMWalk.walkTVDuration.setText(lastWalk.getName() + ", " + lastWalk.getDurationInMinutes() + " min");
+        binding.homeITMWalk.walkTVRate.setText((int)lastWalk.getRate() + "/5");
+        binding.homeITMWalk.walkIMGPoop.setVisibility(!lastWalk.getPoop() ? View.VISIBLE : View.GONE);
+        binding.homeITMWalk.walkIMGPlay.setVisibility(!lastWalk.getPlay() ? View.VISIBLE : View.GONE);
         Glide.
                 with(getContext()).
                 load(lastWalk.getOwner().getProfileImage()).

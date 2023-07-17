@@ -1,6 +1,8 @@
 package com.example.pawsome.view.fragment;
 
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,8 +17,6 @@ import com.example.pawsome.current_state.singletons.CurrentPet;
 import com.example.pawsome.current_state.singletons.CurrentUser;
 import com.example.pawsome.dal.DataCrud;
 import com.example.pawsome.databinding.FragmentAddWalkBinding;
-import com.example.pawsome.model.Meal;
-import com.example.pawsome.model.MealType;
 import com.example.pawsome.model.UserProfile;
 import com.example.pawsome.model.Walk;
 import com.example.pawsome.model.WalkType;
@@ -89,6 +89,8 @@ public class AddWalkFragment extends Fragment {
         binding.addWalkBTNAddNote.setOnClickListener(v -> showAddNote());
         binding.addWalkCVNote.noteBTNCancel.setOnClickListener(v -> hideAddNote());
         binding.addWalkCVNote.noteBTNSave.setOnClickListener(v -> saveNoteText());
+
+        setTextChangedListeners();
     }
 
     private void showAddNote() {
@@ -291,7 +293,7 @@ public class AddWalkFragment extends Fragment {
     }
 
     private void saveWalk() {
-        if (CurrentPet.getInstance().getPetProfile() != null) {
+        if (validateWalkFields() && CurrentPet.getInstance().getPetProfile() != null) {
             Walk walk = new Walk();
 
             String date = binding.addWalkEDTDate.getEditText().getText().toString();
@@ -314,6 +316,93 @@ public class AddWalkFragment extends Fragment {
 
             ((MainActivity) getActivity()).selectWalkLogFragmentOnMenu();
         }
+    }
+
+    private boolean validateWalkFields() {
+        if (binding.addWalkEDTName.getEditText().getText().toString().isEmpty()) {
+            binding.addWalkEDTName.setError("Name is required!");
+            return false;
+        }
+        if (binding.addWalkEDTTime.getEditText().getText().toString().isEmpty()) {
+            binding.addWalkEDTTime.setError("Time is required!");
+            return false;
+        } 
+        if (binding.addWalkEDTDate.getEditText().getText().toString().isEmpty()) {
+            binding.addWalkEDTDate.setError("Date is required!");
+            return false;
+        }
+        if (binding.addWalkEDTDuration.getEditText().getText().toString().isEmpty()) {
+            binding.addWalkEDTDuration.setError("Duration is required!");
+            return false;
+        }
+
+        return true;
+    }
+
+    private void setTextChangedListeners() {
+        binding.addWalkEDTName.getEditText().addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence name, int start, int before, int count) {
+                if (!binding.addWalkEDTName.getEditText().getText().toString().isEmpty())
+                    binding.addWalkEDTName.setError(null);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+        });
+
+        binding.addWalkEDTTime.getEditText().addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence time, int start, int before, int count) {
+                if (!binding.addWalkEDTTime.getEditText().getText().toString().isEmpty())
+                    binding.addWalkEDTTime.setError(null);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+        });
+
+        binding.addWalkEDTDate.getEditText().addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence time, int start, int before, int count) {
+                if (!binding.addWalkEDTDate.getEditText().getText().toString().isEmpty())
+                    binding.addWalkEDTDate.setError(null);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+        });
+
+        binding.addWalkEDTDuration.getEditText().addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence time, int start, int before, int count) {
+                if (!binding.addWalkEDTDuration.getEditText().getText().toString().isEmpty())
+                    binding.addWalkEDTDuration.setError(null);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+        });
     }
 
 
